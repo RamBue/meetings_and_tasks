@@ -5,6 +5,7 @@ import { connectDB } from "./config/db.js";
 import dotenv from "dotenv";
 import rateLimiter from "./middleware/rateLimiter.js";
 import meetingsRoutes from "./routes/meetingsRoutes.js";
+import usersRoutes from "./routes/usersRoutes.js";
 
 dotenv.config();
 
@@ -24,7 +25,7 @@ app.use(rateLimiter);
 
 app.use("/api/tasks", tasksRoutes);
 app.use("/api/meetings", meetingsRoutes);
-
+app.use("/api/users", usersRoutes);
 
 connectDB().then(() => {
   app.listen(PORT, () => {
