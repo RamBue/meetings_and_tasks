@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { CATEGORIES } from "../config/categories.js";
 
 const meetingSchema = new mongoose.Schema(
   {
@@ -7,6 +8,12 @@ const meetingSchema = new mongoose.Schema(
       required: true,
       trim: true,
       minlength: 3,
+    },
+
+    category: {
+      type: String,
+      enum: CATEGORIES,
+      required: true,
     },
 
     description: {

@@ -3,7 +3,7 @@ import Task from "../models/task.js";
 // GET all tasks
 export async function getAllTasks(req, res) {
   try {
-    const { status, meetingId } = req.query;
+    const { status, meetingId, assignedUser } = req.query;
 
     const filter = {};
 
@@ -15,6 +15,10 @@ export async function getAllTasks(req, res) {
     // Filter by meeting
     if (meetingId) {
       filter.meetingId = meetingId;
+    }
+
+    if (assignedUser) {
+      filter.assignedUser = assignedUser;
     }
 
     const tasks = await Task.find(filter)
