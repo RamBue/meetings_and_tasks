@@ -115,7 +115,9 @@ function PendenzBaustein({ task, meetingCategory, meetingStartsAt, onSaved }) {
 
               <Card.Text className="text-muted mb-0">
                 <small>
-                  Wer: {task.assignedUser} · Fällig am:{" "}
+                  Wer: {task.assignedUser} · Erstellt am:{" "}
+                  {new Date(task.createdAt).toLocaleDateString("de-CH")} ·
+                  Fällig am:{" "}
                   {new Date(task.dueDate).toLocaleDateString("de-CH")}
                 </small>
               </Card.Text>
