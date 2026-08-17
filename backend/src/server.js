@@ -4,14 +4,11 @@ import cors from "cors";
 import tasksRoutes from "./routes/tasksRoutes.js";
 import { connectDB } from "./config/db.js";
 import dotenv from "dotenv";
-import rateLimiter from "./middleware/rateLimiter.js";
 import meetingsRoutes from "./routes/meetingsRoutes.js";
 import usersRoutes from "./routes/usersRoutes.js";
 import categoriesRoutes from "./routes/categoriesRoutes.js";
 
 dotenv.config();
-
-console.log(process.env.MONGO_URI);
 
 const app = express();
 const PORT = process.env.PORT || 5002;
@@ -24,7 +21,6 @@ app.use(
 );
 
 app.use(express.json());
-app.use(rateLimiter);
 // our simple custom middleware
 // app.use((req, res, next) => {
 //   console.log(`Req method is ${req.method} & Req URL is ${req.url}`);
