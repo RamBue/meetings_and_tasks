@@ -29,7 +29,20 @@ export async function getMeetingById(req, res) {
       });
     }
 
-    const tasks = await Task.find({ meetingId: req.params.id });
+    // Pendenzen werden rein über ihr Fälligkeitsdatum dem Meeting-Tag zugeordnet,
+    // damit eine verschobene Pendenz beim alten Meeting verschwindet und beim neuen erscheint
+    const meetingDay = new Date(meeting.startsAt);
+    const dayStart = new Date(
+      meetingDay.getFullYear(),
+      meetingDay.getMonth(),
+      meetingDay.getDate(),
+    );
+    const dayEnd = new Date(dayStart);
+    dayEnd.setDate(dayEnd.getDate() + 1);
+
+    const tasks = await Task.find({
+      dueDate: { $gte: dayStart, $lt: dayEnd },
+    }).sort({ dueDate: 1 });
 
     res.status(200).json({ meeting, tasks });
   } catch (error) {
