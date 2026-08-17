@@ -32,7 +32,7 @@ function MeetingOverview({ meetings }) {
               <Card.Text>
                 <strong>Beginn:</strong>
                 <br />
-                {new Date(meeting.endsAt).toLocaleString("de-CH", {
+                {new Date(meeting.startsAt).toLocaleString("de-CH", {
                   year: "numeric",
                   month: "2-digit",
                   day: "2-digit",
