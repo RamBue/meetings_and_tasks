@@ -57,7 +57,7 @@ function MeetingOverview({ meetings }) {
               <Card.Title>{meeting.title}</Card.Title>
 
               <Card.Text className="text-muted">
-                {meeting.description || "Keine Beschreibung vorhanden"}
+                {meeting.location || "Kein Ort angegeben"}
               </Card.Text>
 
               <div className="mt-auto">

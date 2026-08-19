@@ -20,6 +20,11 @@ const meetingSchema = new mongoose.Schema(
       type: String,
     },
 
+    location: {
+      type: String,
+      trim: true,
+    },
+
     startsAt: {
       type: Date,
       required: true,

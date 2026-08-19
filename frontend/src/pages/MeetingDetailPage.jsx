@@ -70,7 +70,7 @@ function MeetingDetailPage() {
             {formatDateTime(meeting.startsAt)} &ndash;{" "}
             {formatDateTime(meeting.endsAt)}
           </p>
-          {meeting.description && <p className="mb-0">{meeting.description}</p>}
+          <p className="mb-0">{meeting.location || "Kein Ort erfasst"}</p>
         </Card.Body>
       </Card>
 
