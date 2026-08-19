@@ -1,5 +1,8 @@
+import fs from "fs";
+import path from "path";
 import Task from "../models/task.js";
 import Meeting from "../models/meeting.js";
+import { protocolsDir } from "../middleware/upload.js";
 
 // GET all meetings
 export async function getMeetings(req, res) {
@@ -100,6 +103,71 @@ export async function updateMeeting(req, res) {
     res.status(500).json({ message: "Internal server error", }); }
 }
 
+// UPLOAD meeting protocol PDF
+export async function uploadMeetingProtocol(req, res) {
+  try {
+    const meeting = await Meeting.findById(req.params.id);
+
+    if (!meeting) {
+      if (req.file) fs.unlinkSync(req.file.path);
+      return res.status(404).json({
+        message: "Meeting not found",
+      });
+    }
+
+    if (!req.file) {
+      return res.status(400).json({
+        message: "Es wurde keine PDF-Datei übermittelt",
+      });
+    }
+
+    if (meeting.protocolFileName) {
+      const oldPath = path.join(protocolsDir, meeting.protocolFileName);
+      if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
+    }
+
+    meeting.protocolFileName = req.file.filename;
+    meeting.protocolOriginalName = req.file.originalname;
+    meeting.protocolUploadedAt = new Date();
+    meeting.protocolApproved = false;
+    meeting.protocolCorrections = "";
+
+    await meeting.save();
+
+    res.status(200).json(meeting);
+  } catch (error) {
+    console.error("Error in uploadMeetingProtocol controller", error);
+
+    res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+}
+
+// DOWNLOAD meeting protocol PDF
+export async function downloadMeetingProtocol(req, res) {
+  try {
+    const meeting = await Meeting.findById(req.params.id);
+
+    if (!meeting || !meeting.protocolFileName) {
+      return res.status(404).json({
+        message: "Für dieses Meeting wurde noch kein Protokoll hochgeladen",
+      });
+    }
+
+    res.download(
+      path.join(protocolsDir, meeting.protocolFileName),
+      meeting.protocolOriginalName || "protokoll.pdf",
+    );
+  } catch (error) {
+    console.error("Error in downloadMeetingProtocol controller", error);
+
+    res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+}
+
 // DELETE meeting
 export async function deleteMeeting(req, res) {
   try {
@@ -109,6 +177,11 @@ export async function deleteMeeting(req, res) {
       return res.status(404).json({
         message: "Meeting not found",
       });
+    }
+
+    if (deletedMeeting.protocolFileName) {
+      const filePath = path.join(protocolsDir, deletedMeeting.protocolFileName);
+      if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
     }
 
     res.status(200).json({

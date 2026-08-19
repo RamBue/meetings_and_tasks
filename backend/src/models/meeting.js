@@ -74,6 +74,29 @@ const meetingSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
+
+    protocolFileName: {
+      type: String,
+    },
+
+    protocolOriginalName: {
+      type: String,
+    },
+
+    protocolUploadedAt: {
+      type: Date,
+    },
+
+    protocolApproved: {
+      type: Boolean,
+      default: false,
+    },
+
+    protocolCorrections: {
+      type: String,
+      trim: true,
+      default: "",
+    },
   },
   {
     timestamps: true,

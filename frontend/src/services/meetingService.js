@@ -35,3 +35,23 @@ export async function updateMeeting(id, updates) {
 
   return response.json();
 }
+
+export async function uploadProtocol(id, file) {
+  const formData = new FormData();
+  formData.append("pdf", file);
+
+  const response = await fetch(`${API_URL}/${id}/protocol`, {
+    method: "POST",
+    body: formData,
+  });
+
+  if (!response.ok) {
+    throw new Error("Protokoll konnte nicht hochgeladen werden");
+  }
+
+  return response.json();
+}
+
+export function getProtocolDownloadUrl(id) {
+  return `${API_URL}/${id}/protocol/download`;
+}

@@ -7,6 +7,7 @@ import { getMeetingById } from "../services/meetingService";
 import { CATEGORIES } from "../config/categories";
 import PendenzBaustein from "../components/PendenzBaustein";
 import MeetingRollenBaustein from "../components/MeetingRollenBaustein";
+import ProtokollBaustein from "../components/ProtokollBaustein";
 
 function formatDateTime(date) {
   return new Date(date).toLocaleString("de-CH", {
@@ -76,6 +77,8 @@ function MeetingDetailPage() {
       </Card>
 
       <MeetingRollenBaustein meeting={meeting} onSaved={loadMeeting} />
+
+      <ProtokollBaustein meeting={meeting} onSaved={loadMeeting} />
 
       <Card>
         <Card.Body>
