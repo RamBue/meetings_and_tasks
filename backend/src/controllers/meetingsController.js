@@ -21,7 +21,11 @@ export async function getMeetings(req, res) {
 // GET single meeting
 export async function getMeetingById(req, res) {
   try {
-    const meeting = await Meeting.findById(req.params.id);
+    const meeting = await Meeting.findById(req.params.id)
+      .populate("chair", "name")
+      .populate("businessUnitLeads", "name")
+      .populate("excusedUsers", "name")
+      .populate("minutesBy", "name");
 
     if (!meeting) {
       return res.status(404).json({

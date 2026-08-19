@@ -45,6 +45,35 @@ const meetingSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
+
+    chair: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+
+    businessUnitLeads: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
+
+    excusedUsers: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
+
+    guests: {
+      type: String,
+      trim: true,
+    },
+
+    minutesBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
   },
   {
     timestamps: true,

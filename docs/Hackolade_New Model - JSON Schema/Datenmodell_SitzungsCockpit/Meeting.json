@@ -27,6 +27,31 @@
             "type": "string",
             "pattern": "^[a-fA-F0-9]{24}$"
         },
+        "chair": {
+            "type": "string",
+            "pattern": "^[a-fA-F0-9]{24}$"
+        },
+        "businessUnitLeads": {
+            "type": "array",
+            "items": {
+                "type": "string",
+                "pattern": "^[a-fA-F0-9]{24}$"
+            }
+        },
+        "excusedUsers": {
+            "type": "array",
+            "items": {
+                "type": "string",
+                "pattern": "^[a-fA-F0-9]{24}$"
+            }
+        },
+        "guests": {
+            "type": "string"
+        },
+        "minutesBy": {
+            "type": "string",
+            "pattern": "^[a-fA-F0-9]{24}$"
+        },
         "createdAt": {
             "type": "string",
             "format": "date"

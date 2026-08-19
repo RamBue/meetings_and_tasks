@@ -6,6 +6,7 @@ import Badge from "react-bootstrap/Badge";
 import { getMeetingById } from "../services/meetingService";
 import { CATEGORIES } from "../config/categories";
 import PendenzBaustein from "../components/PendenzBaustein";
+import MeetingRollenBaustein from "../components/MeetingRollenBaustein";
 
 function formatDateTime(date) {
   return new Date(date).toLocaleString("de-CH", {
@@ -73,6 +74,8 @@ function MeetingDetailPage() {
           <p className="mb-0">{meeting.location || "Kein Ort erfasst"}</p>
         </Card.Body>
       </Card>
+
+      <MeetingRollenBaustein meeting={meeting} onSaved={loadMeeting} />
 
       <Card>
         <Card.Body>
