@@ -1,0 +1,49 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
+    "title": "Task",
+    "properties": {
+        "_id": {
+            "type": "string"
+        },
+        "title": {
+            "type": "string"
+        },
+        "description": {
+            "type": "string"
+        },
+        "meeting_Id": {
+            "type": "string",
+            "pattern": "^[a-fA-F0-9]{24}$"
+        },
+        "createdBy": {
+            "type": "string",
+            "pattern": "^[a-fA-F0-9]{24}$"
+        },
+        "assignedUser": {
+            "type": "string"
+        },
+        "status": {
+            "type": "boolean"
+        },
+        "dueDate": {
+            "type": "string",
+            "format": "date"
+        },
+        "createdAt": {
+            "type": "string",
+            "format": "date"
+        },
+        "updatedAt": {
+            "type": "string",
+            "format": "date"
+        }
+    },
+    "additionalProperties": false,
+    "required": [
+        "title",
+        "assignedUser",
+        "status",
+        "dueDate"
+    ]
+}

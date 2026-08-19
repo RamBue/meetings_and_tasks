@@ -1,0 +1,45 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
+    "title": "Meeting",
+    "properties": {
+        "_id": {
+            "type": "string"
+        },
+        "title": {
+            "type": "string"
+        },
+        "description": {
+            "type": "string"
+        },
+        "location": {
+            "type": "string"
+        },
+        "startsAt": {
+            "type": "string",
+            "format": "date"
+        },
+        "endsAt": {
+            "type": "string",
+            "format": "date"
+        },
+        "createdBy": {
+            "type": "string",
+            "pattern": "^[a-fA-F0-9]{24}$"
+        },
+        "createdAt": {
+            "type": "string",
+            "format": "date"
+        },
+        "updatedAt": {
+            "type": "string",
+            "format": "date"
+        }
+    },
+    "additionalProperties": false,
+    "required": [
+        "title",
+        "startsAt",
+        "endsAt"
+    ]
+}
