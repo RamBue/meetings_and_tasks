@@ -31,6 +31,12 @@ const taskSchema = new mongoose.Schema(
       required: false,
     },
 
+    agendaItemId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "AgendaItem",
+      required: false,
+    },
+
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",

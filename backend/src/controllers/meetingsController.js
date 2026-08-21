@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 import Task from "../models/task.js";
 import Meeting from "../models/meeting.js";
+import AgendaItem from "../models/agendaItem.js";
 import { protocolsDir } from "../middleware/upload.js";
 
 // GET all meetings
@@ -47,11 +48,18 @@ export async function getMeetingById(req, res) {
     const dayEnd = new Date(dayStart);
     dayEnd.setDate(dayEnd.getDate() + 1);
 
+    // Nur Pendenzen ohne Traktandum-Bezug gehören in diesen Block –
+    // neue Pendenzen werden direkt beim jeweiligen Traktandum erfasst
     const tasks = await Task.find({
       dueDate: { $gte: dayStart, $lt: dayEnd },
+      agendaItemId: null,
     }).sort({ dueDate: 1 });
 
-    res.status(200).json({ meeting, tasks });
+    const agendaItems = await AgendaItem.find({ meetingId: meeting._id })
+      .populate("responsibleUser", "name")
+      .sort({ createdAt: 1 });
+
+    res.status(200).json({ meeting, tasks, agendaItems });
   } catch (error) {
     console.error("Error in getMeetingById controller", error);
 

@@ -3,7 +3,7 @@ import Task from "../models/task.js";
 // GET all tasks
 export async function getAllTasks(req, res) {
   try {
-    const { status, meetingId, assignedUser } = req.query;
+    const { status, meetingId, agendaItemId, assignedUser } = req.query;
 
     const filter = {};
 
@@ -15,6 +15,11 @@ export async function getAllTasks(req, res) {
     // Filter by meeting
     if (meetingId) {
       filter.meetingId = meetingId;
+    }
+
+    // Filter by agenda item
+    if (agendaItemId) {
+      filter.agendaItemId = agendaItemId;
     }
 
     if (assignedUser) {

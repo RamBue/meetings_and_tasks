@@ -8,6 +8,7 @@ import { CATEGORIES } from "../config/categories";
 import PendenzBaustein from "../components/PendenzBaustein";
 import MeetingRollenBaustein from "../components/MeetingRollenBaustein";
 import ProtokollBaustein from "../components/ProtokollBaustein";
+import TraktandumBaustein from "../components/TraktandumBaustein";
 
 function formatDateTime(date) {
   return new Date(date).toLocaleString("de-CH", {
@@ -23,6 +24,7 @@ function MeetingDetailPage() {
   const { id } = useParams();
   const [meeting, setMeeting] = useState(null);
   const [tasks, setTasks] = useState([]);
+  const [agendaItems, setAgendaItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -32,6 +34,7 @@ function MeetingDetailPage() {
       const data = await getMeetingById(id);
       setMeeting(data.meeting);
       setTasks(data.tasks);
+      setAgendaItems(data.agendaItems);
     } catch (err) {
       console.error("Fehler beim Laden des Meetings:", err);
       setError("Meeting konnte nicht geladen werden");
@@ -80,21 +83,47 @@ function MeetingDetailPage() {
 
       <ProtokollBaustein meeting={meeting} onSaved={loadMeeting} />
 
-      <Card>
+      <Card className="mb-4">
         <Card.Body>
           <h4 className="mb-3">Pendenzen</h4>
 
-          {tasks.map((task) => (
-            <PendenzBaustein
-              key={task._id}
-              task={task}
+          <Card className="mb-3">
+            <Card.Body className="bg-light rounded">
+              <small className="text-muted d-block mb-3">
+                Fällige Pendenzen aus vorherigen Meetings
+              </small>
+
+              {tasks.map((task) => (
+                <PendenzBaustein
+                  key={task._id}
+                  task={task}
+                  meetingCategory={meeting.category}
+                  meetingStartsAt={meeting.startsAt}
+                  onSaved={loadMeeting}
+                />
+              ))}
+            </Card.Body>
+          </Card>
+        </Card.Body>
+      </Card>
+
+      <Card>
+        <Card.Body>
+          <h4 className="mb-3">Traktanden</h4>
+
+          {agendaItems.map((agendaItem) => (
+            <TraktandumBaustein
+              key={agendaItem._id}
+              agendaItem={agendaItem}
+              meetingId={meeting._id}
               meetingCategory={meeting.category}
               meetingStartsAt={meeting.startsAt}
               onSaved={loadMeeting}
             />
           ))}
 
-          <PendenzBaustein
+          <TraktandumBaustein
+            meetingId={meeting._id}
             meetingCategory={meeting.category}
             meetingStartsAt={meeting.startsAt}
             onSaved={loadMeeting}

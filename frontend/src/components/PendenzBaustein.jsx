@@ -3,17 +3,25 @@ import Card from "react-bootstrap/Card";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import Stack from "react-bootstrap/Stack";
+import Badge from "react-bootstrap/Badge";
 import { createTask, updateTask } from "../services/taskService";
 
 function toInputDate(date) {
   return date ? new Date(date).toISOString().split("T")[0] : "";
 }
 
-function PendenzBaustein({ task, meetingCategory, meetingStartsAt, onSaved }) {
+function PendenzBaustein({
+  task,
+  meetingCategory,
+  meetingStartsAt,
+  agendaItemId,
+  onSaved,
+  onCancelNew,
+}) {
   const isNew = !task;
   const defaultDueDate = toInputDate(meetingStartsAt);
 
-  const [isEditing, setIsEditing] = useState(false);
+  const [isEditing, setIsEditing] = useState(isNew);
   const [title, setTitle] = useState(task?.title || "");
   const [description, setDescription] = useState(task?.description || "");
   const [assignedUser, setAssignedUser] = useState(task?.assignedUser || "");
@@ -33,7 +41,11 @@ function PendenzBaustein({ task, meetingCategory, meetingStartsAt, onSaved }) {
 
   const handleCancel = () => {
     resetForm();
-    setIsEditing(false);
+    if (isNew) {
+      onCancelNew?.();
+    } else {
+      setIsEditing(false);
+    }
   };
 
   const handleSave = async (e) => {
@@ -48,13 +60,14 @@ function PendenzBaustein({ task, meetingCategory, meetingStartsAt, onSaved }) {
       dueDate,
       category: task?.category || meetingCategory,
       status: task?.status || "open",
+      agendaItemId: task?.agendaItemId || agendaItemId,
     };
 
     try {
       if (isNew) {
         await createTask(payload);
         resetForm();
-        setIsEditing(false);
+        onCancelNew?.();
       } else {
         await updateTask(task._id, payload);
         setIsEditing(false);
@@ -79,14 +92,6 @@ function PendenzBaustein({ task, meetingCategory, meetingStartsAt, onSaved }) {
     }
   };
 
-  if (isNew && !isEditing) {
-    return (
-      <Button variant="primary" onClick={() => setIsEditing(true)}>
-        Pendenz hinzufügen
-      </Button>
-    );
-  }
-
   if (!isEditing) {
     return (
       <Card className="mb-3">
@@ -101,6 +106,9 @@ function PendenzBaustein({ task, meetingCategory, meetingStartsAt, onSaved }) {
             />
 
             <div className="flex-grow-1">
+              <Badge bg="secondary" className="mb-1">
+                Pendenz
+              </Badge>
               <Card.Title
                 className={
                   task.status === "done"
@@ -139,6 +147,9 @@ function PendenzBaustein({ task, meetingCategory, meetingStartsAt, onSaved }) {
   return (
     <Card className="mb-3">
       <Card.Body>
+        <Badge bg="secondary" className="mb-2">
+          Pendenz
+        </Badge>
         <Form onSubmit={handleSave}>
           <Form.Group className="mb-2">
             <Form.Label>Titel</Form.Label>

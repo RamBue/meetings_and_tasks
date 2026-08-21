@@ -81,7 +81,7 @@ function ProtokollBaustein({ meeting, onSaved }) {
       <Card className="mb-4">
         <Card.Body>
           <div className="d-flex justify-content-between align-items-start mb-3">
-            <h5 className="mb-0">Protokoll</h5>
+            <h4 className="mb-0">Protokoll</h4>
             <Button
               variant="outline-secondary"
               size="sm"
@@ -144,7 +144,7 @@ function ProtokollBaustein({ meeting, onSaved }) {
   return (
     <Card className="mb-4">
       <Card.Body>
-        <h5 className="mb-3">Protokoll</h5>
+        <h4 className="mb-3">Protokoll</h4>
 
         <Form onSubmit={handleSave}>
           <Form.Group className="mb-3">

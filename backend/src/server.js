@@ -7,6 +7,9 @@ import dotenv from "dotenv";
 import meetingsRoutes from "./routes/meetingsRoutes.js";
 import usersRoutes from "./routes/usersRoutes.js";
 import categoriesRoutes from "./routes/categoriesRoutes.js";
+import decisionsRoutes from "./routes/decisionsRoutes.js";
+import informationsRoutes from "./routes/informationsRoutes.js";
+import agendaItemsRoutes from "./routes/agendaItemsRoutes.js";
 
 dotenv.config();
 
@@ -31,6 +34,9 @@ app.use("/api/tasks", tasksRoutes);
 app.use("/api/meetings", meetingsRoutes);
 app.use("/api/users", usersRoutes);
 app.use("/api/categories", categoriesRoutes);
+app.use("/api/decisions", decisionsRoutes);
+app.use("/api/informations", informationsRoutes);
+app.use("/api/agenda-items", agendaItemsRoutes);
 
 connectDB().then(() => {
   app.listen(PORT, () => {
