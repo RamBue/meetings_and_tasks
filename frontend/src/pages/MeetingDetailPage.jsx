@@ -2,7 +2,6 @@ import { useCallback, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import Container from "react-bootstrap/Container";
 import Card from "react-bootstrap/Card";
-import Badge from "react-bootstrap/Badge";
 import { getMeetingById } from "../services/meetingService";
 import { CATEGORIES } from "../config/categories";
 import PendenzBaustein from "../components/PendenzBaustein";
@@ -58,28 +57,30 @@ function MeetingDetailPage() {
   }
 
   const categoryColor =
-    CATEGORIES.find((c) => c.value === meeting.category)?.color ||
-    "secondary";
+    CATEGORIES.find((c) => c.value === meeting.category)?.color || "#6c757d";
 
   return (
     <Container className="mt-4">
       <Link to="/">&larr; Zurück zur Übersicht</Link>
 
       <Card className="mt-3 mb-4">
-        <Card.Body>
-          <Badge bg={categoryColor} className="mb-2">
-            {meeting.category}
-          </Badge>
+        <Card.Header
+          className="text-white"
+          style={{ backgroundColor: categoryColor }}
+        >
           <h2>{meeting.title}</h2>
-          <p className="text-muted mb-1">
+          <p className="text-white-50 mb-1">
             {formatDateTime(meeting.startsAt)} &ndash;{" "}
             {formatDateTime(meeting.endsAt)}
           </p>
-          <p className="mb-0">{meeting.location || "Kein Ort erfasst"}</p>
+          <p className="text-white-50 mb-0">
+            {meeting.location || "Kein Ort erfasst"}
+          </p>
+        </Card.Header>
+        <Card.Body>
+          <MeetingRollenBaustein meeting={meeting} onSaved={loadMeeting} />
         </Card.Body>
       </Card>
-
-      <MeetingRollenBaustein meeting={meeting} onSaved={loadMeeting} />
 
       <ProtokollBaustein meeting={meeting} onSaved={loadMeeting} />
 

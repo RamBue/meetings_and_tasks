@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import Card from "react-bootstrap/Card";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import Dropdown from "react-bootstrap/Dropdown";
@@ -115,133 +114,129 @@ function MeetingRollenBaustein({ meeting, onSaved }) {
 
   if (!isEditing) {
     return (
-      <Card className="mb-4">
-        <Card.Body>
-          <div className="d-flex justify-content-between align-items-start mb-3">
-            <h5 className="mb-0">Besetzung</h5>
-            <Button
-              variant="outline-secondary"
-              size="sm"
-              onClick={() => setIsEditing(true)}
-            >
-              Bearbeiten
-            </Button>
-          </div>
+      <>
+        <div className="d-flex justify-content-between align-items-start mb-3">
+          <h5 className="mb-0">Besetzung</h5>
+          <Button
+            variant="outline-secondary"
+            size="sm"
+            onClick={() => setIsEditing(true)}
+          >
+            Bearbeiten
+          </Button>
+        </div>
 
-          <Row className="gy-2">
-            <Col md={6}>
-              <strong>Leitung:</strong> {meeting.chair?.name || "–"}
-            </Col>
-            <Col md={6}>
-              <strong>Bereichsleitung:</strong>{" "}
-              {names(meeting.businessUnitLeads)}
-            </Col>
-            <Col md={6}>
-              <strong>Entschuldigt:</strong> {names(meeting.excusedUsers)}
-            </Col>
-            <Col md={6}>
-              <strong>Gäste:</strong> {meeting.guests || "–"}
-            </Col>
-            <Col md={6}>
-              <strong>Protokoll:</strong> {meeting.minutesBy?.name || "–"}
-            </Col>
-          </Row>
-        </Card.Body>
-      </Card>
+        <Row className="gy-2">
+          <Col md={6}>
+            <strong>Leitung:</strong> {meeting.chair?.name || "–"}
+          </Col>
+          <Col md={6}>
+            <strong>Bereichsleitung:</strong>{" "}
+            {names(meeting.businessUnitLeads)}
+          </Col>
+          <Col md={6}>
+            <strong>Entschuldigt:</strong> {names(meeting.excusedUsers)}
+          </Col>
+          <Col md={6}>
+            <strong>Gäste:</strong> {meeting.guests || "–"}
+          </Col>
+          <Col md={6}>
+            <strong>Protokoll:</strong> {meeting.minutesBy?.name || "–"}
+          </Col>
+        </Row>
+      </>
     );
   }
 
   return (
-    <Card className="mb-4">
-      <Card.Body>
-        <h5 className="mb-3">Besetzung</h5>
+    <>
+      <h5 className="mb-3">Besetzung</h5>
 
-        <Form onSubmit={handleSave}>
-          <Row>
-            <Col md={6}>
-              <Form.Group className="mb-3">
-                <Form.Label>Leitung</Form.Label>
-                <Form.Select
-                  value={chair}
-                  onChange={(e) => setChair(e.target.value)}
-                >
-                  <option value="">Bitte wählen...</option>
-                  {users.map((u) => (
-                    <option key={u._id} value={u._id}>
-                      {u.name}
-                    </option>
-                  ))}
-                </Form.Select>
-              </Form.Group>
-            </Col>
+      <Form onSubmit={handleSave}>
+        <Row>
+          <Col md={6}>
+            <Form.Group className="mb-3">
+              <Form.Label>Leitung</Form.Label>
+              <Form.Select
+                value={chair}
+                onChange={(e) => setChair(e.target.value)}
+              >
+                <option value="">Bitte wählen...</option>
+                {users.map((u) => (
+                  <option key={u._id} value={u._id}>
+                    {u.name}
+                  </option>
+                ))}
+              </Form.Select>
+            </Form.Group>
+          </Col>
 
-            <Col md={6}>
-              <Form.Group className="mb-3">
-                <Form.Label>Protokoll</Form.Label>
-                <Form.Select
-                  value={minutesBy}
-                  onChange={(e) => setMinutesBy(e.target.value)}
-                >
-                  <option value="">Bitte wählen...</option>
-                  {users.map((u) => (
-                    <option key={u._id} value={u._id}>
-                      {u.name}
-                    </option>
-                  ))}
-                </Form.Select>
-              </Form.Group>
-            </Col>
+          <Col md={6}>
+            <Form.Group className="mb-3">
+              <Form.Label>Protokoll</Form.Label>
+              <Form.Select
+                value={minutesBy}
+                onChange={(e) => setMinutesBy(e.target.value)}
+              >
+                <option value="">Bitte wählen...</option>
+                {users.map((u) => (
+                  <option key={u._id} value={u._id}>
+                    {u.name}
+                  </option>
+                ))}
+              </Form.Select>
+            </Form.Group>
+          </Col>
 
-            <Col md={6}>
-              <Form.Group className="mb-3">
-                <Form.Label>Bereichsleitung</Form.Label>
-                <MultiUserSelect
-                  idPrefix="bl"
-                  users={users}
-                  selectedIds={businessUnitLeads}
-                  onChange={setBusinessUnitLeads}
-                />
-              </Form.Group>
-            </Col>
+          <Col md={6}>
+            <Form.Group className="mb-3">
+              <Form.Label>Bereichsleitung</Form.Label>
+              <MultiUserSelect
+                idPrefix="bl"
+                users={users}
+                selectedIds={businessUnitLeads}
+                onChange={setBusinessUnitLeads}
+              />
+            </Form.Group>
+          </Col>
 
-            <Col md={6}>
-              <Form.Group className="mb-3">
-                <Form.Label>Entschuldigt</Form.Label>
-                <MultiUserSelect
-                  idPrefix="ex"
-                  users={users}
-                  selectedIds={excusedUsers}
-                  onChange={setExcusedUsers}
-                />
-              </Form.Group>
-            </Col>
+          <Col md={6}>
+            <Form.Group className="mb-3">
+              <Form.Label>Entschuldigt</Form.Label>
+              <MultiUserSelect
+                idPrefix="ex"
+                users={users}
+                selectedIds={excusedUsers}
+                onChange={setExcusedUsers}
+              />
+            </Form.Group>
+          </Col>
 
-            <Col md={12}>
-              <Form.Group className="mb-3">
-                <Form.Label>Gäste</Form.Label>
-                <Form.Control
-                  type="text"
-                  value={guests}
-                  onChange={(e) => setGuests(e.target.value)}
-                  placeholder="Namen der Gäste"
-                />
-              </Form.Group>
-            </Col>
-          </Row>
+          <Col md={12}>
+            <Form.Group className="mb-3">
+              <Form.Label>Gäste</Form.Label>
+              <Form.Control
+                type="text"
+                value={guests}
+                onChange={(e) => setGuests(e.target.value)}
+                placeholder="Namen der Gäste"
+              />
+            </Form.Group>
+          </Col>
+        </Row>
 
-          {error && <div className="text-danger mb-2">{error}</div>}
+        {error && <div className="text-danger mb-2">{error}</div>}
 
-          <div className="d-flex gap-2">
-            <Button type="submit" variant="primary" disabled={saving}>
-              Speichern
-            </Button>
-            <Button variant="outline-secondary" onClick={handleCancel}>
-              Abbrechen
-            </Button>
-          </div>
-        </Form>
-      </Card.Body>
-    </Card>
+        <div className="d-flex gap-2">
+          <Button type="submit" variant="primary" disabled={saving}>
+            Speichern
+          </Button>
+          <Button variant="outline-secondary" onClick={handleCancel}>
+            Abbrechen
+          </Button>
+        </div>
+      </Form>
+    </>
   );
 }
 

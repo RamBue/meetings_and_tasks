@@ -41,14 +41,14 @@ function MyNavbar() {
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="ms-auto align-items-center">
             <Nav.Link as={Link} to="/tasks">
-              Aufgaben
+              Pendenzen
             </Nav.Link>
             <Nav.Link as={Link} to="/">
               Meetings
             </Nav.Link>
 
             <div className="ms-3 d-flex gap-2">
-              <ActiveButton text="Neue Aufgabe" to="/createTask" />
+              <ActiveButton text="Neue Pendenz" to="/createTask" />
 
               <ActiveButton
                 text="Neues Meeting"

@@ -25,7 +25,13 @@ function MeetingOverview({ meetings }) {
         <Col key={meeting._id}>
           <Card className="h-100 shadow-sm">
             <Card.Body className="d-flex flex-column">
-              <Badge bg={categoryColors[meeting.category] || "secondary"}>
+              <Badge
+                bg={null}
+                style={{
+                  backgroundColor: categoryColors[meeting.category] || "#6c757d",
+                  color: "#fff",
+                }}
+              >
                 {meeting.category}
               </Badge>
               <hr />
