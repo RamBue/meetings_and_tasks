@@ -5,7 +5,7 @@ import MeetingDetailPage from "./pages/MeetingDetailPage";
 import CreateTaskPage from "./pages/CreateTaskPage";
 import EditTaskPage from "./pages/EditTaskPage";
 import TasksPage from "./pages/TasksPage";
-import MyNavbar from "./components/navbar";
+import MyNavbar from "./components/Navbar";
 
 const App = () => {
   return (

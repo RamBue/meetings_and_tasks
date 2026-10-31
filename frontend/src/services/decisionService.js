@@ -1,4 +1,6 @@
-const API_URL = "http://localhost:5002/api/decisions";
+import { API_BASE_URL } from "../config/api";
+
+const API_URL = `${API_BASE_URL}/api/decisions`;
 
 export async function getDecisionsByAgendaItem(agendaItemId) {
   const response = await fetch(`${API_URL}?agendaItemId=${agendaItemId}`);

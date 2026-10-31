@@ -3,6 +3,7 @@ import Container from "react-bootstrap/Container";
 import Form from "react-bootstrap/Form";
 import { FaEdit } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { API_BASE_URL } from "../config/api";
 
 function TasksTable({ tasks, loadTasks }) {
   const navigate = useNavigate();
@@ -14,7 +15,7 @@ function TasksTable({ tasks, loadTasks }) {
       const newStatus = task.status === "done" ? "open" : "done";
 
       const response = await fetch(
-        `http://localhost:5002/api/tasks/${task._id}`,
+        `${API_BASE_URL}/api/tasks/${task._id}`,
         {
           method: "PUT",
           headers: {

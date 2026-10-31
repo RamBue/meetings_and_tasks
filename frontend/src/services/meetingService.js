@@ -1,4 +1,6 @@
-const API_URL = "http://localhost:5002/api/meetings";
+import { API_BASE_URL } from "../config/api";
+
+const API_URL = `${API_BASE_URL}/api/meetings`;
 
 export async function getMeetings() {
   const response = await fetch(API_URL);

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import TasksTable from "../components/Table";
 import { Container, Row, Col, Form, Alert } from "react-bootstrap";
 import { useLocation } from "react-router-dom";
+import { API_BASE_URL } from "../config/api";
 
 const TasksPage = () => {
   const [tasks, setTasks] = useState([]);
@@ -26,7 +27,7 @@ const TasksPage = () => {
       }
 
       const response = await fetch(
-        `http://localhost:5002/api/tasks?${params.toString()}`,
+        `${API_BASE_URL}/api/tasks?${params.toString()}`,
       );
 
       if (!response.ok) {
@@ -44,7 +45,7 @@ const TasksPage = () => {
 
   return (
     <Container>
-      <h1>Aufgabenübersicht</h1>
+      <h1>Pendenzenübersicht</h1>
       {location.state?.message && (
         <Alert
           variant="success"
@@ -74,7 +75,7 @@ const TasksPage = () => {
             onChange={(e) => setStatusFilter(e.target.value)}
           >
             {" "}
-            <option value="">Alle Aufgaben</option>
+            <option value="">Alle Pendenzen</option>
             <option value="open">Offen</option>
             <option value="done">Erledigt</option>
           </Form.Select>

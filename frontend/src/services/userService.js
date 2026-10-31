@@ -1,4 +1,6 @@
-const API_URL = "http://localhost:5002/api/users";
+import { API_BASE_URL } from "../config/api";
+
+const API_URL = `${API_BASE_URL}/api/users`;
 
 export async function getUsers() {
   const response = await fetch(API_URL);

@@ -1,4 +1,6 @@
-const API_URL = "http://localhost:5002/api/agenda-items";
+import { API_BASE_URL } from "../config/api";
+
+const API_URL = `${API_BASE_URL}/api/agenda-items`;
 
 export async function createAgendaItem(agendaItem) {
   const response = await fetch(API_URL, {
