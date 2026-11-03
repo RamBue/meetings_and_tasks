@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import MeetingOverview from "../components/MeetingOverview";
 import { getMeetings } from "../services/meetingService";
+import { useDataChanged } from "../hooks/useDataChanged";
 
 const HomePage = () => {
   console.log("HomePage rendered");
@@ -29,6 +30,15 @@ const HomePage = () => {
 
     loadMeetings();
   }, []);
+
+  // Echtzeit-Update: lädt im Hintergrund nach, ohne "Lade Meetings..." einzublenden
+  useDataChanged(async () => {
+    try {
+      setMeetings(await getMeetings());
+    } catch (error) {
+      console.error("Fehler beim Aktualisieren der Meetings:", error);
+    }
+  });
 
   const categories = [
     "Alle",

@@ -3,6 +3,7 @@ import TasksTable from "../components/Table";
 import { Container, Row, Col, Form, Alert } from "react-bootstrap";
 import { useLocation } from "react-router-dom";
 import { API_BASE_URL } from "../config/api";
+import { useDataChanged } from "../hooks/useDataChanged";
 
 const TasksPage = () => {
   const [tasks, setTasks] = useState([]);
@@ -40,6 +41,9 @@ const TasksPage = () => {
       console.error(error);
     }
   };
+
+  // Echtzeit-Update: lädt die Liste mit den aktuellen Filtern neu
+  useDataChanged(loadTasks);
 
   const users = [...new Set(tasks.map((task) => task.assignedUser))];
 
