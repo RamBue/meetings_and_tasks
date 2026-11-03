@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 import TasksTable from "../components/Table";
-import { Container, Row, Col, Form, Alert } from "react-bootstrap";
+import { Container, Row, Col, Form, Alert, Button } from "react-bootstrap";
 import { useLocation } from "react-router-dom";
 import { API_BASE_URL } from "../config/api";
 import { useDataChanged } from "../hooks/useDataChanged";
+import { exportTasksPdf } from "../utils/exportTasksPdf";
 
 const TasksPage = () => {
   const [tasks, setTasks] = useState([]);
@@ -45,6 +46,15 @@ const TasksPage = () => {
   // Echtzeit-Update: lädt die Liste mit den aktuellen Filtern neu
   useDataChanged(loadTasks);
 
+  const handleExportPdf = () => {
+    const statusText = { open: "Offen", done: "Erledigt" }[statusFilter];
+    const filterParts = [
+      statusText ? `Status: ${statusText}` : "Alle Pendenzen",
+      userFilter ? `Verantwortlich: ${userFilter}` : "",
+    ].filter(Boolean);
+    exportTasksPdf(tasks, filterParts.join(" · "));
+  };
+
   const users = [...new Set(tasks.map((task) => task.assignedUser))];
 
   return (
@@ -83,6 +93,16 @@ const TasksPage = () => {
             <option value="open">Offen</option>
             <option value="done">Erledigt</option>
           </Form.Select>
+        </Col>
+
+        <Col md={4} className="text-md-end">
+          <Button
+            variant="outline-secondary"
+            onClick={handleExportPdf}
+            disabled={tasks.length === 0}
+          >
+            Als PDF exportieren
+          </Button>
         </Col>
       </Row>
 
