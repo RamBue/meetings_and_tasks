@@ -4,6 +4,7 @@ import Task from "../models/task.js";
 import Meeting from "../models/meeting.js";
 import AgendaItem from "../models/agendaItem.js";
 import { protocolsDir } from "../middleware/upload.js";
+import { notifyChange } from "../config/socket.js";
 
 // GET all meetings
 export async function getMeetings(req, res) {
@@ -78,6 +79,7 @@ export async function createMeeting(req, res) {
 
     const savedMeeting = await newMeeting.save();
 
+    notifyChange("meeting", "created", savedMeeting._id);
     res.status(201).json(savedMeeting);
   } catch (error) { console.error("Error in createMeeting controller", error); 
     // Mongoose Validation Error 
@@ -103,6 +105,7 @@ export async function updateMeeting(req, res) {
       });
     }
 
+    notifyChange("meeting", "updated", updatedMeeting._id);
     res.status(200).json(updatedMeeting);
   } catch (error) { console.error("Error in updateMeeting controller", error); 
     // Mongoose Validation Error 
@@ -142,6 +145,7 @@ export async function uploadMeetingProtocol(req, res) {
 
     await meeting.save();
 
+    notifyChange("meeting", "updated", meeting._id);
     res.status(200).json(meeting);
   } catch (error) {
     console.error("Error in uploadMeetingProtocol controller", error);
@@ -192,6 +196,7 @@ export async function deleteMeeting(req, res) {
       if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
     }
 
+    notifyChange("meeting", "deleted", deletedMeeting._id);
     res.status(200).json({
       message: "Meeting deleted successfully",
     });

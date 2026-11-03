@@ -1,4 +1,5 @@
 import Decision from "../models/decision.js";
+import { notifyChange } from "../config/socket.js";
 
 // GET all decisions
 export async function getAllDecisions(req, res) {
@@ -56,6 +57,7 @@ export async function createDecision(req, res) {
       agendaItemId,
     });
     const savedDecision = await newDecision.save();
+    notifyChange("decision", "created", savedDecision._id);
     res.status(201).json(savedDecision);
   } catch (error) {
     console.error("Error in createDecision controller", error);
@@ -78,6 +80,7 @@ export async function updateDecision(req, res) {
     if (!updatedDecision)
       return res.status(404).json({ message: "Decision not found" });
 
+    notifyChange("decision", "updated", updatedDecision._id);
     res.status(200).json(updatedDecision);
   } catch (error) {
     console.error("Error in updateDecision controller", error);
@@ -94,6 +97,7 @@ export async function deleteDecision(req, res) {
     const deletedDecision = await Decision.findByIdAndDelete(req.params.id);
     if (!deletedDecision)
       return res.status(404).json({ message: "Decision not found" });
+    notifyChange("decision", "deleted", deletedDecision._id);
     res.status(200).json({ message: "Decision deleted successfully!" });
   } catch (error) {
     console.error("Error in deleteDecision controller", error);

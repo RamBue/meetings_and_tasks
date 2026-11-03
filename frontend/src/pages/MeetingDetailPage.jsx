@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import Container from "react-bootstrap/Container";
 import Card from "react-bootstrap/Card";
 import { getMeetingById } from "../services/meetingService";
+import { useDataChanged } from "../hooks/useDataChanged";
 import { CATEGORIES } from "../config/categories";
 import PendenzBaustein from "../components/PendenzBaustein";
 import MeetingRollenBaustein from "../components/MeetingRollenBaustein";
@@ -42,9 +43,24 @@ function MeetingDetailPage() {
     }
   }, [id]);
 
+  // Echtzeit-Update: lädt die Daten im Hintergrund nach, ohne die Seite
+  // auf "Lade Meeting..." zu schalten (sonst gehen offene Eingaben verloren)
+  const refreshMeeting = useCallback(async () => {
+    try {
+      const data = await getMeetingById(id);
+      setMeeting(data.meeting);
+      setTasks(data.tasks);
+      setAgendaItems(data.agendaItems);
+    } catch (err) {
+      console.error("Fehler beim Aktualisieren des Meetings:", err);
+    }
+  }, [id]);
+
   useEffect(() => {
     loadMeeting();
   }, [loadMeeting]);
+
+  useDataChanged(refreshMeeting);
 
   if (loading) {
     return <Container className="mt-4">Lade Meeting...</Container>;

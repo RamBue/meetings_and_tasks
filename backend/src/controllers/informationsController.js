@@ -1,4 +1,5 @@
 import Information from "../models/information.js";
+import { notifyChange } from "../config/socket.js";
 
 // GET all informations
 export async function getAllInformations(req, res) {
@@ -46,6 +47,7 @@ export async function createInformation(req, res) {
     const information = req.body;
     const newInformation = new Information(information);
     const savedInformation = await newInformation.save();
+    notifyChange("information", "created", savedInformation._id);
     res.status(201).json(savedInformation);
   } catch (error) {
     console.error("Error in createInformation controller", error);
@@ -68,6 +70,7 @@ export async function updateInformation(req, res) {
     if (!updatedInformation)
       return res.status(404).json({ message: "Information not found" });
 
+    notifyChange("information", "updated", updatedInformation._id);
     res.status(200).json(updatedInformation);
   } catch (error) {
     console.error("Error in updateInformation controller", error);
@@ -86,6 +89,7 @@ export async function deleteInformation(req, res) {
     );
     if (!deletedInformation)
       return res.status(404).json({ message: "Information not found" });
+    notifyChange("information", "deleted", deletedInformation._id);
     res.status(200).json({ message: "Information deleted successfully!" });
   } catch (error) {
     console.error("Error in deleteInformation controller", error);

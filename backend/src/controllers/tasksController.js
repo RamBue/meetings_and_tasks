@@ -1,4 +1,5 @@
 import Task from "../models/task.js";
+import { notifyChange } from "../config/socket.js";
 
 // GET all tasks
 export async function getAllTasks(req, res) {
@@ -58,6 +59,7 @@ export async function createTask(req, res) {
     const task = req.body;
     const newTask = new Task(task);
     const savedTask = await newTask.save();
+    notifyChange("task", "created", savedTask._id);
     res.status(201).json(savedTask);
   } catch (error) {
     console.error("Error in createTask controller", error);
@@ -79,6 +81,7 @@ export async function updateTask(req, res) {
     if (!updatedTask)
       return res.status(404).json({ message: "Task not found" });
 
+    notifyChange("task", "updated", updatedTask._id);
     res.status(200).json(updatedTask);
   } catch (error) {
     console.error("Error in updateTask controller", error);
@@ -97,6 +100,7 @@ export async function deleteTask(req, res) {
     const deletedTask = await Task.findByIdAndDelete(req.params.id);
     if (!deletedTask)
       return res.status(404).json({ message: "Task not found" });
+    notifyChange("task", "deleted", deletedTask._id);
     res.status(200).json({ message: "Task deleted successfully!" });
   } catch (error) {
     console.error("Error in deleteTask controller", error);

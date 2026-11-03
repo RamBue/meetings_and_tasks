@@ -1,4 +1,5 @@
 import AgendaItem from "../models/agendaItem.js";
+import { notifyChange } from "../config/socket.js";
 
 // GET all agenda items
 export async function getAllAgendaItems(req, res) {
@@ -47,6 +48,7 @@ export async function createAgendaItem(req, res) {
     const newAgendaItem = new AgendaItem(agendaItem);
     const savedAgendaItem = await newAgendaItem.save();
     const populated = await savedAgendaItem.populate("responsibleUser", "name");
+    notifyChange("agendaItem", "created", populated._id);
     res.status(201).json(populated);
   } catch (error) {
     console.error("Error in createAgendaItem controller", error);
@@ -68,6 +70,7 @@ export async function updateAgendaItem(req, res) {
     if (!updatedAgendaItem)
       return res.status(404).json({ message: "Agenda item not found" });
 
+    notifyChange("agendaItem", "updated", updatedAgendaItem._id);
     res.status(200).json(updatedAgendaItem);
   } catch (error) {
     console.error("Error in updateAgendaItem controller", error);
@@ -86,6 +89,7 @@ export async function deleteAgendaItem(req, res) {
     );
     if (!deletedAgendaItem)
       return res.status(404).json({ message: "Agenda item not found" });
+    notifyChange("agendaItem", "deleted", deletedAgendaItem._id);
     res.status(200).json({ message: "Agenda item deleted successfully!" });
   } catch (error) {
     console.error("Error in deleteAgendaItem controller", error);

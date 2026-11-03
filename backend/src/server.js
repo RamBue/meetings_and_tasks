@@ -1,6 +1,8 @@
 import express from "express";
 // const express = require("express");
+import { createServer } from "http";
 import cors from "cors";
+import { initSocket } from "./config/socket.js";
 import tasksRoutes from "./routes/tasksRoutes.js";
 import { connectDB } from "./config/db.js";
 import dotenv from "dotenv";
@@ -42,8 +44,11 @@ app.use("/api/decisions", decisionsRoutes);
 app.use("/api/informations", informationsRoutes);
 app.use("/api/agenda-items", agendaItemsRoutes);
 
+const httpServer = createServer(app);
+initSocket(httpServer, allowedOrigins);
+
 connectDB().then(() => {
-  app.listen(PORT, () => {
+  httpServer.listen(PORT, () => {
     console.log("Server started on PORT:", PORT);
   });
 });
