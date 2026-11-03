@@ -1,30 +1,12 @@
-import { useEffect, useState } from "react";
 import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
-import NavDropdown from "react-bootstrap/NavDropdown";
 import { Link } from "react-router";
 
 import logo from "../assets/logo.png";
 import ActiveButton from "./Button";
-import { getMeetings } from "../services/meetingService";
 
 function MyNavbar() {
-  const [meetings, setMeetings] = useState([]);
-
-  useEffect(() => {
-    const loadMeetings = async () => {
-      try {
-        const data = await getMeetings();
-        setMeetings(data);
-      } catch (error) {
-        console.error("Fehler beim Laden der Meetings:", error);
-      }
-    };
-
-    loadMeetings();
-  }, []);
-
   return (
     <Navbar expand="lg" bg="light">
       <Container>

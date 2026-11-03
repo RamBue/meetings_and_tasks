@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import Container from "react-bootstrap/Container";
 import Card from "react-bootstrap/Card";
@@ -32,39 +32,43 @@ function MeetingDetailPage() {
   const [exporting, setExporting] = useState(false);
   const [exportError, setExportError] = useState("");
 
-  const loadMeeting = useCallback(async () => {
-    try {
-      setLoading(true);
-      const data = await getMeetingById(id);
-      setMeeting(data.meeting);
-      setTasks(data.tasks);
-      setAgendaItems(data.agendaItems);
-    } catch (err) {
-      console.error("Fehler beim Laden des Meetings:", err);
-      setError("Meeting konnte nicht geladen werden");
-    } finally {
-      setLoading(false);
-    }
-  }, [id]);
+  const [reloadKey, setReloadKey] = useState(0);
+  const hasLoaded = useRef(false);
 
-  // Echtzeit-Update: lädt die Daten im Hintergrund nach, ohne die Seite
-  // auf "Lade Meeting..." zu schalten (sonst gehen offene Eingaben verloren)
-  const refreshMeeting = useCallback(async () => {
-    try {
-      const data = await getMeetingById(id);
-      setMeeting(data.meeting);
-      setTasks(data.tasks);
-      setAgendaItems(data.agendaItems);
-    } catch (err) {
-      console.error("Fehler beim Aktualisieren des Meetings:", err);
-    }
-  }, [id]);
+  // Löst ein erneutes Laden aus. Die Daten werden im Hintergrund nachgeladen,
+  // ohne die Seite auf "Lade Meeting..." zu schalten (sonst gehen offene
+  // Eingaben verloren).
+  const loadMeeting = useCallback(() => setReloadKey((key) => key + 1), []);
 
   useEffect(() => {
-    loadMeeting();
-  }, [loadMeeting]);
+    let cancelled = false;
 
-  useDataChanged(refreshMeeting);
+    getMeetingById(id)
+      .then((data) => {
+        if (cancelled) return;
+        setMeeting(data.meeting);
+        setTasks(data.tasks);
+        setAgendaItems(data.agendaItems);
+        hasLoaded.current = true;
+      })
+      .catch((err) => {
+        console.error("Fehler beim Laden des Meetings:", err);
+        // Die Fehlermeldung erscheint nur, wenn das Meeting noch nie geladen werden konnte
+        if (!cancelled && !hasLoaded.current) {
+          setError("Meeting konnte nicht geladen werden");
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [id, reloadKey]);
+
+  // Echtzeit-Update
+  useDataChanged(loadMeeting);
 
   const handleExport = async (mode) => {
     try {

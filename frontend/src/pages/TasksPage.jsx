@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import TasksTable from "../components/Table";
 import { Container, Row, Col, Form, Alert, Button } from "react-bootstrap";
 import { useLocation } from "react-router-dom";
@@ -12,36 +12,40 @@ const TasksPage = () => {
   const [userFilter, setUserFilter] = useState("");
   const location = useLocation();
 
+  const [reloadKey, setReloadKey] = useState(0);
+
+  // Löst ein erneutes Laden mit den aktuellen Filtern aus
+  const loadTasks = useCallback(() => setReloadKey((key) => key + 1), []);
+
   useEffect(() => {
-    loadTasks();
-  }, [statusFilter, userFilter]);
+    let cancelled = false;
 
-  const loadTasks = async () => {
-    try {
-      const params = new URLSearchParams();
+    const params = new URLSearchParams();
 
-      if (statusFilter) {
-        params.append("status", statusFilter);
-      }
-
-      if (userFilter) {
-        params.append("assignedUser", userFilter);
-      }
-
-      const response = await fetch(
-        `${API_BASE_URL}/api/tasks?${params.toString()}`,
-      );
-
-      if (!response.ok) {
-        throw new Error("Fehler beim Laden der Tasks");
-      }
-
-      const data = await response.json();
-      setTasks(data);
-    } catch (error) {
-      console.error(error);
+    if (statusFilter) {
+      params.append("status", statusFilter);
     }
-  };
+
+    if (userFilter) {
+      params.append("assignedUser", userFilter);
+    }
+
+    fetch(`${API_BASE_URL}/api/tasks?${params.toString()}`)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Fehler beim Laden der Tasks");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        if (!cancelled) setTasks(data);
+      })
+      .catch((error) => console.error(error));
+
+    return () => {
+      cancelled = true;
+    };
+  }, [statusFilter, userFilter, reloadKey]);
 
   // Echtzeit-Update: lädt die Liste mit den aktuellen Filtern neu
   useDataChanged(loadTasks);

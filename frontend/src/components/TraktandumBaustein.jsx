@@ -52,25 +52,34 @@ function TraktandumBaustein({
       .catch((err) => console.error("Fehler beim Laden der Benutzer:", err));
   }, []);
 
-  const loadNested = useCallback(async () => {
-    if (!agendaItem) return;
-    try {
-      const [decisionsData, informationsData, tasksData] = await Promise.all([
-        getDecisionsByAgendaItem(agendaItem._id),
-        getInformationsByAgendaItem(agendaItem._id),
-        getTasksByAgendaItem(agendaItem._id),
-      ]);
-      setDecisions(decisionsData);
-      setInformations(informationsData);
-      setTasks(tasksData);
-    } catch (err) {
-      console.error("Fehler beim Laden der Traktandum-Inhalte:", err);
-    }
-  }, [agendaItem]);
+  const [reloadKey, setReloadKey] = useState(0);
+
+  // Löst ein erneutes Laden der Entscheide, Informationen und Pendenzen aus
+  const loadNested = useCallback(() => setReloadKey((key) => key + 1), []);
 
   useEffect(() => {
-    loadNested();
-  }, [loadNested]);
+    if (!agendaItem) return;
+    let cancelled = false;
+
+    Promise.all([
+      getDecisionsByAgendaItem(agendaItem._id),
+      getInformationsByAgendaItem(agendaItem._id),
+      getTasksByAgendaItem(agendaItem._id),
+    ])
+      .then(([decisionsData, informationsData, tasksData]) => {
+        if (cancelled) return;
+        setDecisions(decisionsData);
+        setInformations(informationsData);
+        setTasks(tasksData);
+      })
+      .catch((err) =>
+        console.error("Fehler beim Laden der Traktandum-Inhalte:", err),
+      );
+
+    return () => {
+      cancelled = true;
+    };
+  }, [agendaItem, reloadKey]);
 
   const resetForm = () => {
     setTitle(agendaItem?.title || "");
