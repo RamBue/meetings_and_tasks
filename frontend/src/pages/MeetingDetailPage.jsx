@@ -2,8 +2,10 @@ import { useCallback, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import Container from "react-bootstrap/Container";
 import Card from "react-bootstrap/Card";
+import Dropdown from "react-bootstrap/Dropdown";
 import { getMeetingById } from "../services/meetingService";
 import { useDataChanged } from "../hooks/useDataChanged";
+import { exportMeetingPdf } from "../utils/exportMeetingPdf";
 import { CATEGORIES } from "../config/categories";
 import PendenzBaustein from "../components/PendenzBaustein";
 import MeetingRollenBaustein from "../components/MeetingRollenBaustein";
@@ -27,6 +29,8 @@ function MeetingDetailPage() {
   const [agendaItems, setAgendaItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [exporting, setExporting] = useState(false);
+  const [exportError, setExportError] = useState("");
 
   const loadMeeting = useCallback(async () => {
     try {
@@ -62,6 +66,19 @@ function MeetingDetailPage() {
 
   useDataChanged(refreshMeeting);
 
+  const handleExport = async (mode) => {
+    try {
+      setExporting(true);
+      setExportError("");
+      await exportMeetingPdf({ meeting, tasks, agendaItems, mode });
+    } catch (err) {
+      console.error("Fehler beim PDF-Export:", err);
+      setExportError("PDF konnte nicht erstellt werden");
+    } finally {
+      setExporting(false);
+    }
+  };
+
   if (loading) {
     return <Container className="mt-4">Lade Meeting...</Container>;
   }
@@ -77,7 +94,24 @@ function MeetingDetailPage() {
 
   return (
     <Container className="mt-4">
-      <Link to="/">&larr; Zurück zur Übersicht</Link>
+      <div className="d-flex justify-content-between align-items-center">
+        <Link to="/">&larr; Zurück zur Übersicht</Link>
+
+        <Dropdown align="end">
+          <Dropdown.Toggle variant="outline-secondary" disabled={exporting}>
+            {exporting ? "PDF wird erstellt..." : "Als PDF exportieren"}
+          </Dropdown.Toggle>
+          <Dropdown.Menu>
+            <Dropdown.Item onClick={() => handleExport("invitation")}>
+              Einladung
+            </Dropdown.Item>
+            <Dropdown.Item onClick={() => handleExport("minutes")}>
+              Protokoll
+            </Dropdown.Item>
+          </Dropdown.Menu>
+        </Dropdown>
+      </div>
+      {exportError && <div className="text-danger mt-2">{exportError}</div>}
 
       <Card className="mt-3 mb-4">
         <Card.Header
