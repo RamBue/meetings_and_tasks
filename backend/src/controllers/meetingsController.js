@@ -1,12 +1,52 @@
 import fs from "fs";
-import path from "path";
 import Task from "../models/task.js";
 import Meeting from "../models/meeting.js";
 import AgendaItem from "../models/agendaItem.js";
 import Decision from "../models/decision.js";
 import Information from "../models/information.js";
-import { protocolsDir } from "../middleware/upload.js";
+import { protocolFilePath } from "../middleware/upload.js";
 import { notifyChange } from "../config/socket.js";
+import { pick } from "../utils/sanitize.js";
+
+// Felder, die ein Client setzen darf. Die Angaben zur hochgeladenen Datei
+// (protocolFileName, protocolOriginalName, protocolUploadedAt) setzt nur der Server.
+const MEETING_CREATE_FIELDS = [
+  "title",
+  "category",
+  "description",
+  "location",
+  "startsAt",
+  "endsAt",
+  "chair",
+  "businessUnitLeads",
+  "excusedUsers",
+  "guests",
+  "minutesBy",
+];
+
+const MEETING_UPDATE_FIELDS = [
+  ...MEETING_CREATE_FIELDS,
+  "protocolApproved",
+  "protocolCorrections",
+];
+
+// Prüft anhand der ersten Bytes, ob die Datei wirklich ein PDF ist
+function isPdfFile(filePath) {
+  const fd = fs.openSync(filePath, "r");
+  try {
+    const header = Buffer.alloc(5);
+    fs.readSync(fd, header, 0, 5, 0);
+    return header.toString("latin1") === "%PDF-";
+  } finally {
+    fs.closeSync(fd);
+  }
+}
+
+// Löscht eine Protokoll-Datei, falls sie existiert
+function removeProtocolFile(fileName) {
+  const filePath = protocolFilePath(fileName);
+  if (filePath && fs.existsSync(filePath)) fs.unlinkSync(filePath);
+}
 
 // GET all meetings
 export async function getMeetings(req, res) {
@@ -75,7 +115,7 @@ export async function getMeetingById(req, res) {
 // CREATE meeting
 export async function createMeeting(req, res) {
   try {
-    const meeting = req.body;
+    const meeting = pick(req.body, MEETING_CREATE_FIELDS);
 
     const newMeeting = new Meeting(meeting);
 
@@ -93,9 +133,11 @@ export async function createMeeting(req, res) {
 // UPDATE meeting
 export async function updateMeeting(req, res) {
   try {
-    // Beim Verschieben müssen beide Zeitpunkte gesetzt sein und das Ende muss
-    // nach dem Beginn liegen (die Validierung im Schema greift bei Updates nicht)
-    if (req.body.startsAt || req.body.endsAt) {
+    const updates = pick(req.body, MEETING_UPDATE_FIELDS);
+
+    // Beim Verschieben muss das Ende nach dem Beginn liegen (die Validierung
+    // im Schema greift bei Updates nicht)
+    if (updates.startsAt || updates.endsAt) {
       const existing = await Meeting.findById(req.params.id);
       if (!existing) {
         return res.status(404).json({
@@ -103,8 +145,8 @@ export async function updateMeeting(req, res) {
         });
       }
 
-      const startsAt = new Date(req.body.startsAt || existing.startsAt);
-      const endsAt = new Date(req.body.endsAt || existing.endsAt);
+      const startsAt = new Date(updates.startsAt || existing.startsAt);
+      const endsAt = new Date(updates.endsAt || existing.endsAt);
 
       if (isNaN(startsAt) || isNaN(endsAt) || endsAt <= startsAt) {
         return res.status(400).json({
@@ -115,7 +157,7 @@ export async function updateMeeting(req, res) {
 
     const updatedMeeting = await Meeting.findByIdAndUpdate(
       req.params.id,
-      req.body,
+      updates,
       {
         new: true,
       },
@@ -154,10 +196,15 @@ export async function uploadMeetingProtocol(req, res) {
       });
     }
 
-    if (meeting.protocolFileName) {
-      const oldPath = path.join(protocolsDir, meeting.protocolFileName);
-      if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
+    // Der Inhalt muss ein PDF sein, die vom Client gemeldete Dateiart genügt nicht
+    if (!isPdfFile(req.file.path)) {
+      fs.unlinkSync(req.file.path);
+      return res.status(400).json({
+        message: "Nur PDF-Dateien sind erlaubt",
+      });
     }
+
+    removeProtocolFile(meeting.protocolFileName);
 
     meeting.protocolFileName = req.file.filename;
     meeting.protocolOriginalName = req.file.originalname;
@@ -183,16 +230,15 @@ export async function downloadMeetingProtocol(req, res) {
   try {
     const meeting = await Meeting.findById(req.params.id);
 
-    if (!meeting || !meeting.protocolFileName) {
+    const filePath = meeting && protocolFilePath(meeting.protocolFileName);
+
+    if (!filePath || !fs.existsSync(filePath)) {
       return res.status(404).json({
         message: "Für dieses Meeting wurde noch kein Protokoll hochgeladen",
       });
     }
 
-    res.download(
-      path.join(protocolsDir, meeting.protocolFileName),
-      meeting.protocolOriginalName || "protokoll.pdf",
-    );
+    res.download(filePath, meeting.protocolOriginalName || "protokoll.pdf");
   } catch (error) {
     console.error("Error in downloadMeetingProtocol controller", error);
 
@@ -213,10 +259,7 @@ export async function deleteMeeting(req, res) {
       });
     }
 
-    if (deletedMeeting.protocolFileName) {
-      const filePath = path.join(protocolsDir, deletedMeeting.protocolFileName);
-      if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
-    }
+    removeProtocolFile(deletedMeeting.protocolFileName);
 
     // Traktanden, Entscheide und Informationen gehören fest zum Meeting und
     // werden mitgelöscht. Pendenzen bleiben bestehen und werden nur vom

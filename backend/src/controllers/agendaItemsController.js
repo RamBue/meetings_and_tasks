@@ -4,6 +4,18 @@ import Decision from "../models/decision.js";
 import Information from "../models/information.js";
 import Task from "../models/task.js";
 import { notifyChange } from "../config/socket.js";
+import { isObjectIdString, pick } from "../utils/sanitize.js";
+
+// Felder, die ein Client setzen darf
+const AGENDA_ITEM_FIELDS = [
+  "title",
+  "responsibleUser",
+  "plannedFrom",
+  "plannedTo",
+  "actualFrom",
+  "actualTo",
+  "meetingId",
+];
 
 // Ein Traktandum darf nur verschoben oder gelöscht werden, solange es noch keinen
 // Entscheid, keine Information und keine Pendenz enthält. Sobald etwas erfasst
@@ -60,7 +72,7 @@ export async function getAgendaItemById(req, res) {
 // CREATE agenda item
 export async function createAgendaItem(req, res) {
   try {
-    const agendaItem = req.body;
+    const agendaItem = pick(req.body, AGENDA_ITEM_FIELDS);
     const newAgendaItem = new AgendaItem(agendaItem);
     const savedAgendaItem = await newAgendaItem.save();
     const populated = await savedAgendaItem.populate("responsibleUser", "name");
@@ -82,10 +94,16 @@ export async function updateAgendaItem(req, res) {
     if (!existing)
       return res.status(404).json({ message: "Agenda item not found" });
 
+    const updates = pick(req.body, AGENDA_ITEM_FIELDS);
+
+    if (updates.meetingId && !isObjectIdString(updates.meetingId)) {
+      return res.status(400).json({ message: "Invalid meetingId" });
+    }
+
     // Ein anderes meetingId verschiebt das Traktandum in dieses Meeting
     const targetMeetingId =
-      req.body.meetingId && String(req.body.meetingId) !== String(existing.meetingId)
-        ? req.body.meetingId
+      updates.meetingId && String(updates.meetingId) !== String(existing.meetingId)
+        ? updates.meetingId
         : null;
 
     if (targetMeetingId) {
@@ -101,7 +119,7 @@ export async function updateAgendaItem(req, res) {
 
     const updatedAgendaItem = await AgendaItem.findByIdAndUpdate(
       req.params.id,
-      req.body,
+      updates,
       { new: true, runValidators: true },
     ).populate("responsibleUser", "name");
 

@@ -1,5 +1,9 @@
 import Information from "../models/information.js";
 import { notifyChange } from "../config/socket.js";
+import { pick } from "../utils/sanitize.js";
+
+// Felder, die ein Client beim Anlegen setzen darf
+const INFORMATION_FIELDS = ["topic", "description", "meetingId", "agendaItemId"];
 
 // GET all informations
 export async function getAllInformations(req, res) {
@@ -44,7 +48,7 @@ export async function getInformationById(req, res) {
 // CREATE information
 export async function createInformation(req, res) {
   try {
-    const information = req.body;
+    const information = pick(req.body, INFORMATION_FIELDS);
     const newInformation = new Information(information);
     const savedInformation = await newInformation.save();
     notifyChange("information", "created", savedInformation._id);

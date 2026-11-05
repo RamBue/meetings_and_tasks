@@ -13,6 +13,17 @@ export const protocolsDir = path.join(
 );
 fs.mkdirSync(protocolsDir, { recursive: true });
 
+// Liefert den vollständigen Pfad einer Protokoll-Datei. Es zählt nur der
+// Dateiname, so kann ein gespeicherter Wert wie "../../datei" nie aus dem
+// Upload-Ordner hinausführen.
+export function protocolFilePath(fileName) {
+  if (!fileName) return null;
+
+  const resolved = path.resolve(protocolsDir, path.basename(String(fileName)));
+
+  return resolved.startsWith(protocolsDir + path.sep) ? resolved : null;
+}
+
 const protocolStorage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, protocolsDir),
   filename: (req, file, cb) => {

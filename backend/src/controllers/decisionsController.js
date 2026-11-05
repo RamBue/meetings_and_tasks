@@ -1,5 +1,6 @@
 import Decision from "../models/decision.js";
 import { notifyChange } from "../config/socket.js";
+import { isObjectIdString } from "../utils/sanitize.js";
 
 // GET all decisions
 export async function getAllDecisions(req, res) {
@@ -43,6 +44,11 @@ export async function getDecisionById(req, res) {
 export async function createDecision(req, res) {
   try {
     const { meetingId, agendaItemId, topic, description } = req.body;
+
+    // meetingId fliesst in eine Abfrage ein und muss deshalb ein reiner Text sein
+    if (!isObjectIdString(meetingId)) {
+      return res.status(400).json({ message: "Invalid meetingId" });
+    }
 
     const lastDecision = await Decision.findOne({ meetingId }).sort({
       number: -1,

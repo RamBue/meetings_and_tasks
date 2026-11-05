@@ -1,5 +1,18 @@
 import Task from "../models/task.js";
 import { notifyChange } from "../config/socket.js";
+import { pick } from "../utils/sanitize.js";
+
+// Felder, die ein Client setzen darf
+const TASK_FIELDS = [
+  "title",
+  "category",
+  "description",
+  "meetingId",
+  "agendaItemId",
+  "assignedUser",
+  "status",
+  "dueDate",
+];
 
 // GET all tasks
 export async function getAllTasks(req, res) {
@@ -56,7 +69,7 @@ export async function getTaskById(req, res) {
 // CREATE task
 export async function createTask(req, res) {
   try {
-    const task = req.body;
+    const task = pick(req.body, TASK_FIELDS);
     const newTask = new Task(task);
     const savedTask = await newTask.save();
     notifyChange("task", "created", savedTask._id);
@@ -75,9 +88,13 @@ export async function createTask(req, res) {
 // UPDATE task
 export async function updateTask(req, res) {
   try {
-    const updatedTask = await Task.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-    });
+    const updatedTask = await Task.findByIdAndUpdate(
+      req.params.id,
+      pick(req.body, TASK_FIELDS),
+      {
+        new: true,
+      },
+    );
     if (!updatedTask)
       return res.status(404).json({ message: "Task not found" });
 
