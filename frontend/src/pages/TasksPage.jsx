@@ -5,6 +5,7 @@ import { useLocation } from "react-router-dom";
 import { API_BASE_URL } from "../config/api";
 import { useDataChanged } from "../hooks/useDataChanged";
 import { exportTasksPdf } from "../utils/exportTasksPdf";
+import { apiFetch } from "../services/apiFetch";
 
 const TasksPage = () => {
   const [tasks, setTasks] = useState([]);
@@ -31,7 +32,7 @@ const TasksPage = () => {
       params.append("assignedUser", userFilter);
     }
 
-    fetch(`${API_BASE_URL}/api/tasks?${params.toString()}`)
+    apiFetch(`${API_BASE_URL}/api/tasks?${params.toString()}`)
       .then((response) => {
         if (!response.ok) {
           throw new Error("Fehler beim Laden der Tasks");
@@ -53,7 +54,7 @@ const TasksPage = () => {
   useEffect(() => {
     let cancelled = false;
 
-    fetch(`${API_BASE_URL}/api/tasks`)
+    apiFetch(`${API_BASE_URL}/api/tasks`)
       .then((response) => {
         if (!response.ok) {
           throw new Error("Fehler beim Laden der Verantwortlichen");

@@ -6,7 +6,7 @@ import Stack from "react-bootstrap/Stack";
 import {
   updateMeeting,
   uploadProtocol,
-  getProtocolDownloadUrl,
+  downloadProtocol,
 } from "../services/meetingService";
 
 function ProtokollBaustein({ meeting, onSaved }) {
@@ -26,6 +26,17 @@ function ProtokollBaustein({ meeting, onSaved }) {
   const handleCancel = () => {
     resetForm();
     setIsEditing(false);
+  };
+
+  const handleDownload = async () => {
+    setError("");
+
+    try {
+      await downloadProtocol(meeting._id, meeting.protocolOriginalName);
+    } catch (err) {
+      console.error(err);
+      setError("Protokoll konnte nicht heruntergeladen werden");
+    }
   };
 
   const handleSave = async (e) => {
@@ -96,13 +107,13 @@ function ProtokollBaustein({ meeting, onSaved }) {
             <div>
               <strong>Dokument:</strong>{" "}
               {meeting.protocolOriginalName ? (
-                <a
-                  href={getProtocolDownloadUrl(meeting._id)}
-                  target="_blank"
-                  rel="noreferrer"
+                <Button
+                  variant="link"
+                  className="p-0 align-baseline"
+                  onClick={handleDownload}
                 >
                   {meeting.protocolOriginalName}
-                </a>
+                </Button>
               ) : (
                 "–"
               )}

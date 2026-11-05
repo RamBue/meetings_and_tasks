@@ -1,9 +1,10 @@
 import { API_BASE_URL } from "../config/api";
+import { apiFetch } from "./apiFetch";
 
 const API_URL = `${API_BASE_URL}/api/agenda-items`;
 
 export async function createAgendaItem(agendaItem) {
-  const response = await fetch(API_URL, {
+  const response = await apiFetch(API_URL, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -29,7 +30,7 @@ function conflictError() {
 }
 
 export async function deleteAgendaItem(id) {
-  const response = await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+  const response = await apiFetch(`${API_URL}/${id}`, { method: "DELETE" });
 
   if (response.status === 409) throw conflictError();
   if (!response.ok) {
@@ -40,7 +41,7 @@ export async function deleteAgendaItem(id) {
 }
 
 export async function updateAgendaItem(id, updates) {
-  const response = await fetch(`${API_URL}/${id}`, {
+  const response = await apiFetch(`${API_URL}/${id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",

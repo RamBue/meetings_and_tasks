@@ -1,10 +1,17 @@
 import { Server } from "socket.io";
+import { verifyToken } from "../utils/token.js";
 
 let io;
 
 export function initSocket(httpServer, allowedOrigins) {
   io = new Server(httpServer, {
     cors: { origin: allowedOrigins },
+  });
+
+  // Verbindung nur mit gültigem Token (wie bei der REST-API)
+  io.use((socket, next) => {
+    if (verifyToken(socket.handshake.auth?.token)) return next();
+    next(new Error("unauthorized"));
   });
 
   io.on("connection", (socket) => {

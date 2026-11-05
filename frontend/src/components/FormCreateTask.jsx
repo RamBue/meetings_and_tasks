@@ -4,6 +4,7 @@ import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Container from "react-bootstrap/Container";
 import { API_BASE_URL } from "../config/api";
+import { apiFetch } from "../services/apiFetch";
 
 function FormCreateTask() {
   const navigate = useNavigate();
@@ -18,7 +19,7 @@ function FormCreateTask() {
 
   // Kategorien laden
   useEffect(() => {
-    fetch(`${API_BASE_URL}/api/categories`)
+    apiFetch(`${API_BASE_URL}/api/categories`)
       .then((res) => {
         if (!res.ok) {
           throw new Error("Fehler beim Laden der Kategorien");
@@ -35,7 +36,7 @@ function FormCreateTask() {
 
     const loadTask = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}/api/tasks/${id}`);
+        const response = await apiFetch(`${API_BASE_URL}/api/tasks/${id}`);
 
         if (!response.ok) {
           throw new Error("Task konnte nicht geladen werden");
@@ -79,7 +80,7 @@ function FormCreateTask() {
     const method = id ? "PUT" : "POST";
 
     try {
-      const response = await fetch(url, {
+      const response = await apiFetch(url, {
         method,
         headers: {
           "Content-Type": "application/json",

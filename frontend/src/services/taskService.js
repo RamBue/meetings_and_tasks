@@ -1,9 +1,10 @@
 import { API_BASE_URL } from "../config/api";
+import { apiFetch } from "./apiFetch";
 
 const API_URL = `${API_BASE_URL}/api/tasks`;
 
 export async function getTasksByAgendaItem(agendaItemId) {
-  const response = await fetch(`${API_URL}?agendaItemId=${agendaItemId}`);
+  const response = await apiFetch(`${API_URL}?agendaItemId=${agendaItemId}`);
 
   if (!response.ok) {
     throw new Error("Pendenzen konnten nicht geladen werden");
@@ -13,7 +14,7 @@ export async function getTasksByAgendaItem(agendaItemId) {
 }
 
 export async function createTask(task) {
-  const response = await fetch(API_URL, {
+  const response = await apiFetch(API_URL, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -29,7 +30,7 @@ export async function createTask(task) {
 }
 
 export async function updateTask(id, updates) {
-  const response = await fetch(`${API_URL}/${id}`, {
+  const response = await apiFetch(`${API_URL}/${id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",

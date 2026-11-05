@@ -10,6 +10,12 @@ services:
         sync: false
       - key: CORS_ORIGIN
         sync: false
+      - key: AUTH_USER
+        sync: false
+      - key: AUTH_PASSWORD_HASH
+        sync: false
+      - key: JWT_SECRET
+        sync: false
 
   - type: web
     name: meetings-frontend

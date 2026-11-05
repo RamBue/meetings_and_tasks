@@ -4,6 +4,7 @@ import Form from "react-bootstrap/Form";
 import { FaEdit } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { API_BASE_URL } from "../config/api";
+import { apiFetch } from "../services/apiFetch";
 
 function TasksTable({ tasks, loadTasks }) {
   const navigate = useNavigate();
@@ -14,7 +15,7 @@ function TasksTable({ tasks, loadTasks }) {
     try {
       const newStatus = task.status === "done" ? "open" : "done";
 
-      const response = await fetch(
+      const response = await apiFetch(
         `${API_BASE_URL}/api/tasks/${task._id}`,
         {
           method: "PUT",

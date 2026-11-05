@@ -14,8 +14,17 @@ import categoriesRoutes from "./routes/categoriesRoutes.js";
 import decisionsRoutes from "./routes/decisionsRoutes.js";
 import informationsRoutes from "./routes/informationsRoutes.js";
 import agendaItemsRoutes from "./routes/agendaItemsRoutes.js";
+import authRoutes from "./routes/authRoutes.js";
+import { requireAuth } from "./middleware/auth.js";
+import { isAuthConfigured } from "./utils/token.js";
 
 dotenv.config();
+
+if (!isAuthConfigured()) {
+  console.error(
+    "ACHTUNG: Login ist nicht konfiguriert. AUTH_USER, AUTH_PASSWORD_HASH und JWT_SECRET (mindestens 32 Zeichen) setzen. Bis dahin ist keine Anmeldung möglich.",
+  );
+}
 
 const app = express();
 const PORT = process.env.PORT || 5002;
@@ -83,6 +92,12 @@ app.use(express.json());
 //   console.log(`Req method is ${req.method} & Req URL is ${req.url}`);
 //   next();
 // });
+
+// Anmeldung: als einzige Route ohne Token erreichbar
+app.use("/api/auth", authRoutes);
+
+// Ab hier ist für alles ein gültiges Token nötig
+app.use("/api", requireAuth);
 
 app.use("/api/tasks", tasksRoutes);
 app.use("/api/meetings", meetingsRoutes);

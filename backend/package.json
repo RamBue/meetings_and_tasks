@@ -5,7 +5,8 @@
   "main": "src/server.js",
   "scripts": {
     "dev": "nodemon src/server.js",
-    "start": "node src/server.js"
+    "start": "node src/server.js",
+    "hash-password": "node scripts/hash-password.js"
   },
   "type": "module",
   "keywords": [],
@@ -17,6 +18,7 @@
     "express": "^4.22.1",
     "express-rate-limit": "^8.7.3",
     "helmet": "^8.3.0",
+    "jsonwebtoken": "^9.0.3",
     "mongoose": "^7.0.3",
     "multer": "^2.2.0",
     "socket.io": "^4.8.4"

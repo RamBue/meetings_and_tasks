@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { io } from "socket.io-client";
 import { API_BASE_URL } from "../config/api";
+import { getToken } from "../auth/authStorage";
 
 // Ruft onChange auf, sobald das Backend per Socket.io eine Datenänderung meldet.
 // Mehrere Events kurz hintereinander werden zu einem Aufruf zusammengefasst.
@@ -12,7 +13,10 @@ export function useDataChanged(onChange) {
   }, [onChange]);
 
   useEffect(() => {
-    const socket = io(API_BASE_URL);
+    // Das Token wird bei jeder (Wieder-)Verbindung neu gelesen
+    const socket = io(API_BASE_URL, {
+      auth: (callback) => callback({ token: getToken() }),
+    });
     let timer;
 
     socket.on("data:changed", () => {

@@ -21,12 +21,14 @@ Heute werden Einladungen, Traktandenlisten, Protokolle und Pendenzenlisten in Wo
 - Protokoll-PDF hochladen, Genehmigung und Korrekturen erfassen
 - PDF-Export der Meeting-Detailseite als Einladung oder Protokoll
 
+- Meetings anlegen, verschieben und löschen
+- Anmeldung mit einem gemeinsamen Zugang (ein Benutzer, ein Passwort), mehrere Geräte gleichzeitig möglich
+
 **Nicht umgesetzt**
 
-- Meeting anlegen (der Button in der Navbar ist deaktiviert)
 - Slider in der Meeting-Übersicht
 - Drag & Drop für Pendenzen
-- Login und Zugriffsverwaltung, Suchfunktion (laut Projektantrag nicht Teil der Arbeit)
+- Benutzerverwaltung mit mehreren Konten und Rollen, Suchfunktion (laut Projektantrag nicht Teil der Arbeit)
 
 ## Technik
 
@@ -116,13 +118,44 @@ In der `.env` zeigt `MONGODB_URI` auf den Docker-Host `mongo`. Ohne Docker erset
 | `PORT` | Backend | Port der API, Standard `5002` |
 | `MONGODB_URI` | Backend | Verbindung zur MongoDB |
 | `CORS_ORIGIN` | Backend | Erlaubte Adressen des Frontends, durch Komma getrennt. Gilt auch für Socket.io |
+| `AUTH_USER` | Backend | Benutzername der Anmeldung |
+| `AUTH_PASSWORD_HASH` | Backend | Hash des Passworts, erzeugt mit `npm run hash-password` (siehe Abschnitt Anmeldung) |
+| `JWT_SECRET` | Backend | Geheimer Text (mindestens 32 Zeichen) zum Signieren der Anmeldungen |
+| `JWT_EXPIRES_IN` | Backend | Gültigkeit einer Anmeldung, Standard `7d` |
 | `VITE_API_URL` | Frontend (beim Build) | Adresse des Backends, Standard `http://localhost:5002` |
 
 `VITE_API_URL` wird beim Build in die App eingebaut. Ändert sie sich, muss das Frontend neu gebaut werden.
 
+## Anmeldung
+
+Die Anwendung ist durch eine Anmeldung geschützt. Es gibt einen gemeinsamen Zugang (ein Benutzer, ein Passwort), der aus den Umgebungsvariablen kommt. Mehrere Geräte können gleichzeitig mit denselben Zugangsdaten angemeldet sein, denn der Server merkt sich keine Sitzungen: Nach der Anmeldung stellt er ein signiertes Token aus (JWT, standardmässig 7 Tage gültig), das der Browser bei jeder Anfrage mitschickt.
+
+**Zugang einrichten**
+
+1. Passwort-Hash erzeugen (im Ordner `backend`, das Passwort wird unsichtbar eingegeben, mindestens 12 Zeichen):
+
+   ```bash
+   npm run hash-password
+   ```
+
+2. Geheimen Text für `JWT_SECRET` erzeugen:
+
+   ```bash
+   node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"
+   ```
+
+3. `AUTH_USER`, `AUTH_PASSWORD_HASH` und `JWT_SECRET` in die `.env` (lokal) bzw. in die Umgebungsvariablen des Backends auf Render eintragen. Fehlt einer der Werte, ist keine Anmeldung möglich.
+
+**Wirkung**
+
+- Alle Routen unter `/api` ausser `POST /api/auth/login` verlangen das Token im Header `Authorization: Bearer <Token>`, ebenso die Verbindung für Socket.io. `GET /api/auth/me` prüft ein Token.
+- Das Passwort wird nur als scrypt-Hash gespeichert. Nach 10 Fehlversuchen sperrt das Backend die Anmeldung für die Adresse während 15 Minuten.
+- Das Frontend speichert das Token im `localStorage` und meldet bei Ablauf oder Ablehnung durch das Backend automatisch ab.
+- **Passwort ändern oder alle Geräte abmelden:** `AUTH_PASSWORD_HASH` bzw. `JWT_SECRET` ändern. Mit neuem `JWT_SECRET` werden alle bestehenden Anmeldungen ungültig. Bei geändertem `AUTH_USER` ebenfalls.
+
 ## REST-API
 
-Alle Routen liegen unter `/api`. Die Ressourcen Pendenzen, Meetings, Traktanden, Entscheide und Informationen bieten die üblichen Aufrufe `GET /`, `GET /:id`, `POST /`, `PUT /:id` und `DELETE /:id`.
+Alle Routen liegen unter `/api` und verlangen eine Anmeldung (siehe oben). Die Ressourcen Pendenzen, Meetings, Traktanden, Entscheide und Informationen bieten die üblichen Aufrufe `GET /`, `GET /:id`, `POST /`, `PUT /:id` und `DELETE /:id`.
 
 | Pfad | Ressource | Hinweise |
 |---|---|---|
@@ -179,7 +212,7 @@ Die PDFs entstehen im Browser, das Backend ist daran nicht beteiligt.
 
 Das Deployment ist in `render.yaml` beschrieben. Es besteht aus zwei Diensten:
 
-- **Backend:** Docker-Dienst (Frankfurt, Free-Plan). Umgebungsvariablen `MONGODB_URI` und `CORS_ORIGIN`.
+- **Backend:** Docker-Dienst (Frankfurt, Free-Plan). Umgebungsvariablen `MONGODB_URI`, `CORS_ORIGIN`, `AUTH_USER`, `AUTH_PASSWORD_HASH` und `JWT_SECRET`. `CORS_ORIGIN` muss die Adressen des Frontends enthalten, auch eigene Domains.
 - **Frontend:** statische Seite. Build mit `npm ci && npm run build`, Umgebungsvariable `VITE_API_URL`. Alle Pfade werden auf `index.html` umgeleitet.
 
 Render baut nach einem Push auf `main` automatisch neu, sofern `autoDeploy` im Dashboard aktiv ist.

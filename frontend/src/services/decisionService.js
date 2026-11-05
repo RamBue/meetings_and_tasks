@@ -1,9 +1,10 @@
 import { API_BASE_URL } from "../config/api";
+import { apiFetch } from "./apiFetch";
 
 const API_URL = `${API_BASE_URL}/api/decisions`;
 
 export async function getDecisionsByAgendaItem(agendaItemId) {
-  const response = await fetch(`${API_URL}?agendaItemId=${agendaItemId}`);
+  const response = await apiFetch(`${API_URL}?agendaItemId=${agendaItemId}`);
 
   if (!response.ok) {
     throw new Error("Entscheide konnten nicht geladen werden");
@@ -13,7 +14,7 @@ export async function getDecisionsByAgendaItem(agendaItemId) {
 }
 
 export async function createDecision(decision) {
-  const response = await fetch(API_URL, {
+  const response = await apiFetch(API_URL, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -29,7 +30,7 @@ export async function createDecision(decision) {
 }
 
 export async function updateDecision(id, updates) {
-  const response = await fetch(`${API_URL}/${id}`, {
+  const response = await apiFetch(`${API_URL}/${id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",

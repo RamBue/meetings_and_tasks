@@ -9,6 +9,7 @@ import { API_BASE_URL } from "../config/api";
 import { getUsers } from "../services/userService";
 import { createMeeting } from "../services/meetingService";
 import MultiUserSelect from "./MultiUserSelect";
+import { apiFetch } from "../services/apiFetch";
 
 function FormCreateMeeting() {
   const navigate = useNavigate();
@@ -33,7 +34,7 @@ function FormCreateMeeting() {
 
   // Kategorien laden
   useEffect(() => {
-    fetch(`${API_BASE_URL}/api/categories`)
+    apiFetch(`${API_BASE_URL}/api/categories`)
       .then((res) => {
         if (!res.ok) {
           throw new Error("Fehler beim Laden der Kategorien");
