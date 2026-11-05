@@ -8,6 +8,7 @@ import { exportTasksPdf } from "../utils/exportTasksPdf";
 
 const TasksPage = () => {
   const [tasks, setTasks] = useState([]);
+  const [users, setUsers] = useState([]);
   const [statusFilter, setStatusFilter] = useState("open");
   const [userFilter, setUserFilter] = useState("");
   const location = useLocation();
@@ -47,6 +48,30 @@ const TasksPage = () => {
     };
   }, [statusFilter, userFilter, reloadKey]);
 
+  // Auswahl "Verantwortlich": immer alle Personen aus sämtlichen Pendenzen,
+  // unabhängig von den gesetzten Filtern, damit man direkt wechseln kann
+  useEffect(() => {
+    let cancelled = false;
+
+    fetch(`${API_BASE_URL}/api/tasks`)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Fehler beim Laden der Verantwortlichen");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        if (cancelled) return;
+        const names = [...new Set(data.map((task) => task.assignedUser))];
+        setUsers(names.sort((a, b) => a.localeCompare(b, "de")));
+      })
+      .catch((error) => console.error(error));
+
+    return () => {
+      cancelled = true;
+    };
+  }, [reloadKey]);
+
   // Echtzeit-Update: lädt die Liste mit den aktuellen Filtern neu
   useDataChanged(loadTasks);
 
@@ -58,8 +83,6 @@ const TasksPage = () => {
     ].filter(Boolean);
     exportTasksPdf(tasks, filterParts.join(" · "));
   };
-
-  const users = [...new Set(tasks.map((task) => task.assignedUser))];
 
   return (
     <Container>
