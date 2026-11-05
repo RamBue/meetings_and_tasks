@@ -5,7 +5,7 @@ function CreateTaskPage() {
   return (
     <Container>
     <div>
-      <h1>Pendenz erstellen</h1>
+      <h1 className="page-title h2">Pendenz erstellen</h1>
       <FormCreateTask />
     </div>
     </Container>

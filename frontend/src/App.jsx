@@ -12,13 +12,15 @@ const App = () => {
     <div className="d-flex flex-column min-vh-100">
       <MyNavbar />
 
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/meeting/:id" element={<MeetingDetailPage />} />
-        <Route path="/createTask" element={<CreateTaskPage />} />
-        <Route path="/tasks" element={<TasksPage />} />
-        <Route path="/tasks/:id/edit" element={<EditTaskPage />} />
-      </Routes>
+      <main className="app-main">
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/meeting/:id" element={<MeetingDetailPage />} />
+          <Route path="/createTask" element={<CreateTaskPage />} />
+          <Route path="/tasks" element={<TasksPage />} />
+          <Route path="/tasks/:id/edit" element={<EditTaskPage />} />
+        </Routes>
+      </main>
 
       <Footer />
     </div>

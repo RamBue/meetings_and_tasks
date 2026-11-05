@@ -83,7 +83,8 @@ function ProtokollBaustein({ meeting, onSaved }) {
           <div className="d-flex justify-content-between align-items-start mb-3">
             <h4 className="mb-0">Protokoll</h4>
             <Button
-              variant="outline-secondary"
+              variant="light"
+              className="btn-soft"
               size="sm"
               onClick={() => setIsEditing(true)}
             >

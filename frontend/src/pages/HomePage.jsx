@@ -54,8 +54,8 @@ const HomePage = () => {
   }
 
   return (
-    <div className="container mt-4">
-      <h2 className="mb-4">Meetings</h2>
+    <div className="container">
+      <h2 className="page-title h2">Meetings</h2>
       <div className="mb-3">
         <label className="form-label">Kategorie auswählen</label>
 

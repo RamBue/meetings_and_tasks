@@ -86,7 +86,8 @@ function InformationBaustein({
             </div>
 
             <Button
-              variant="outline-secondary"
+              variant="link"
+              className="btn-quiet text-decoration-none"
               size="sm"
               onClick={() => setIsEditing(true)}
             >

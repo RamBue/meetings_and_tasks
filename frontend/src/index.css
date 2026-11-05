@@ -1,0 +1,74 @@
+/* Rahmen aller Karten etwas kräftiger als der Bootstrap-Standard (div.card, damit es Bootstrap schlägt, das danach geladen wird) */
+div.card {
+  --bs-card-border-color: #adb5bd;
+}
+
+/* Grau hinterlegte Karten (Traktanden, fällige Pendenzen): dunkler als bg-light, damit sie auch auf schwächeren Monitoren/Beamern sichtbar bleiben */
+.bg-surface {
+  background-color: #e3e7eb;
+}
+
+/* Auf der dunkleren Karte braucht der helle Button etwas mehr Kontrast */
+.bg-surface .btn.btn-soft {
+  --bs-btn-color: #343a40;
+  --bs-btn-bg: #cdd3d9;
+  --bs-btn-border-color: #cdd3d9;
+  --bs-btn-hover-bg: #bfc6ce;
+  --bs-btn-hover-border-color: #bfc6ce;
+  --bs-btn-active-bg: #b3bbc4;
+  --bs-btn-active-border-color: #b3bbc4;
+}
+
+/* Abstand zwischen Seiteninhalt und Footer */
+.app-main {
+  padding-bottom: 2rem;
+}
+
+/* Seitenüberschriften: fett, mit Abstand zur Navigationsleiste.
+   Die Grösse kommt von der Bootstrap-Klasse .h2, die Selektoren mit Element schlagen das später geladene Bootstrap. */
+h1.page-title,
+h2.page-title {
+  font-weight: 700;
+  margin-top: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+/* Navigationsleiste: weiss mit grünem Akzentstrich */
+.app-navbar {
+  background-color: #fff;
+  border-bottom: 3px solid #a7c947;
+}
+
+/* Dezente Buttons für Bearbeiten & Co. (doppelte Klasse, damit sie Bootstrap schlagen, das danach geladen wird) */
+
+/* Helle Füllung: aktiver Button, der nicht dominiert */
+.btn.btn-soft {
+  --bs-btn-color: #495057;
+  --bs-btn-bg: #e9ecef;
+  --bs-btn-border-color: #e9ecef;
+  --bs-btn-hover-color: #212529;
+  --bs-btn-hover-bg: #dee2e6;
+  --bs-btn-hover-border-color: #dee2e6;
+  --bs-btn-active-color: #212529;
+  --bs-btn-active-bg: #ced4da;
+  --bs-btn-active-border-color: #ced4da;
+  --bs-btn-disabled-color: #6c757d;
+  --bs-btn-disabled-bg: transparent;
+  --bs-btn-disabled-border-color: #ced4da;
+}
+
+/* Text-Button ohne Hintergrund, nur beim Hover hinterlegt */
+.btn.btn-quiet {
+  --bs-btn-color: #6c757d;
+  --bs-btn-bg: transparent;
+  --bs-btn-border-color: transparent;
+  --bs-btn-hover-color: #212529;
+  --bs-btn-hover-bg: #e9ecef;
+  --bs-btn-hover-border-color: #e9ecef;
+  --bs-btn-active-color: #212529;
+  --bs-btn-active-bg: #dee2e6;
+  --bs-btn-active-border-color: #dee2e6;
+  --bs-btn-disabled-color: #adb5bd;
+  --bs-btn-disabled-bg: transparent;
+  --bs-btn-disabled-border-color: transparent;
+}

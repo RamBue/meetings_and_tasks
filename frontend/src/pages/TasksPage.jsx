@@ -63,7 +63,7 @@ const TasksPage = () => {
 
   return (
     <Container>
-      <h1>Pendenzenübersicht</h1>
+      <h1 className="page-title h2">Pendenzenübersicht</h1>
       {location.state?.message && (
         <Alert
           variant="success"

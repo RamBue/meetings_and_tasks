@@ -221,7 +221,7 @@ function TraktandumBaustein({
 
   return (
     <Card className="mb-3">
-      <Card.Body className="bg-light rounded">
+      <Card.Body className="bg-surface rounded">
         <div className="mb-3">
           {isEditing ? (
             <Form onSubmit={handleSave}>
@@ -332,14 +332,15 @@ function TraktandumBaustein({
                 <Card.Title className="mb-0">{agendaItem.title}</Card.Title>
                 <Stack direction="horizontal" gap={2}>
                   <Button
-                    variant="outline-secondary"
+                    variant="light"
+                    className="btn-soft"
                     size="sm"
                     onClick={() => setIsEditing(true)}
                   >
                     Bearbeiten
                   </Button>
                   <Button
-                    variant="outline-danger"
+                    variant={saving || hasContent ? "outline-danger" : "danger"}
                     size="sm"
                     onClick={handleDelete}
                     disabled={saving || hasContent}

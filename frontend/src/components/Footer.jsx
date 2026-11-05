@@ -2,7 +2,7 @@ import Container from "react-bootstrap/Container";
 import { FaQuestionCircle } from "react-icons/fa";
 import { MANUAL_URL, SUPPORT_EMAIL } from "../config/links";
 
-// Farben aus dem Logo: Dunkelblau von «web», Grün von «timize»
+// Farben aus dem officimo-Logo: Dunkelblau und Grün
 const LOGO_DARK = "#101525";
 const LOGO_GREEN = "#a7c947";
 

@@ -102,7 +102,11 @@ function MeetingDetailPage() {
         <Link to="/">&larr; Zurück zur Übersicht</Link>
 
         <Dropdown align="end">
-          <Dropdown.Toggle variant="outline-secondary" disabled={exporting}>
+          <Dropdown.Toggle
+            variant="light"
+            className="btn-soft"
+            disabled={exporting}
+          >
             {exporting ? "PDF wird erstellt..." : "Als PDF exportieren"}
           </Dropdown.Toggle>
           <Dropdown.Menu>
@@ -143,7 +147,7 @@ function MeetingDetailPage() {
           <h4 className="mb-3">Pendenzen</h4>
 
           <Card className="mb-3">
-            <Card.Body className="bg-light rounded">
+            <Card.Body className="bg-surface rounded">
               <small className="text-muted d-block mb-3">
                 Fällige Pendenzen aus vorherigen Meetings
               </small>

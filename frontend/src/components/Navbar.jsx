@@ -3,19 +3,19 @@ import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import { Link } from "react-router";
 
-import logo from "../assets/logo.png";
+import logo from "../assets/logo.svg";
 import ActiveButton from "./Button";
 
 function MyNavbar() {
   return (
-    <Navbar expand="lg" bg="light">
+    <Navbar expand="lg" className="app-navbar">
       <Container>
         <Navbar.Brand
           as={Link}
           to="/"
           className="d-flex align-items-center gap-2"
         >
-          <img src={logo} alt="Sitzungs-Cockpit" height="40" />
+          <img src={logo} alt="officimo" height="40" />
         </Navbar.Brand>
 
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
