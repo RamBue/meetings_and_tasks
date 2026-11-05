@@ -9,18 +9,9 @@ import { exportMeetingPdf } from "../utils/exportMeetingPdf";
 import { CATEGORIES } from "../config/categories";
 import PendenzBaustein from "../components/PendenzBaustein";
 import MeetingRollenBaustein from "../components/MeetingRollenBaustein";
+import MeetingKopfBaustein from "../components/MeetingKopfBaustein";
 import ProtokollBaustein from "../components/ProtokollBaustein";
 import TraktandumBaustein from "../components/TraktandumBaustein";
-
-function formatDateTime(date) {
-  return new Date(date).toLocaleString("de-CH", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
 
 function MeetingDetailPage() {
   const { id } = useParams();
@@ -126,14 +117,11 @@ function MeetingDetailPage() {
           className="text-white"
           style={{ backgroundColor: categoryColor }}
         >
-          <h2>{meeting.title}</h2>
-          <p className="text-white-50 mb-1">
-            {formatDateTime(meeting.startsAt)} &ndash;{" "}
-            {formatDateTime(meeting.endsAt)}
-          </p>
-          <p className="text-white-50 mb-0">
-            {meeting.location || "Kein Ort erfasst"}
-          </p>
+          <MeetingKopfBaustein
+            meeting={meeting}
+            agendaItemCount={agendaItems.length}
+            onSaved={loadMeeting}
+          />
         </Card.Header>
         <Card.Body>
           <MeetingRollenBaustein meeting={meeting} onSaved={loadMeeting} />

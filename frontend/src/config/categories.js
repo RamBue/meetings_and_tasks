@@ -2,16 +2,16 @@ export const CATEGORIES = [
   {
     value: "Führungsteam-Meeting",
     label: "Führungsteam-Meeting",
-    color: "#0d6efd",
+    color: "#3d1523",
   },
   {
     value: "Klausur Publishing",
     label: "Klausur Publishing",
-    color: "#212529",
+    color: "#7a2f4a",
   },
   {
-    value: "Mangagement-Meeting",
+    value: "Management-Meeting",
     label: "Management-Meeting",
-    color: "#776477",
+    color: "#a05872",
   },
 ];

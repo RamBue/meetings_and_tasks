@@ -35,7 +35,7 @@ function MyNavbar() {
               <ActiveButton
                 text="Neues Meeting"
                 to="/createMeeting"
-                disabled={true}
+                variant="primary"
               />
             </div>
           </Nav>

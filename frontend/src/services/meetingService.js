@@ -22,6 +22,22 @@ export async function getMeetingById(id) {
   return response.json();
 }
 
+export async function createMeeting(meeting) {
+  const response = await fetch(API_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(meeting),
+  });
+
+  if (!response.ok) {
+    throw new Error("Meeting konnte nicht gespeichert werden");
+  }
+
+  return response.json();
+}
+
 export async function updateMeeting(id, updates) {
   const response = await fetch(`${API_URL}/${id}`, {
     method: "PUT",
@@ -33,6 +49,18 @@ export async function updateMeeting(id, updates) {
 
   if (!response.ok) {
     throw new Error("Meeting konnte nicht aktualisiert werden");
+  }
+
+  return response.json();
+}
+
+export async function deleteMeeting(id) {
+  const response = await fetch(`${API_URL}/${id}`, {
+    method: "DELETE",
+  });
+
+  if (!response.ok) {
+    throw new Error("Meeting konnte nicht gelöscht werden");
   }
 
   return response.json();

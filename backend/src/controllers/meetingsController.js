@@ -3,6 +3,8 @@ import path from "path";
 import Task from "../models/task.js";
 import Meeting from "../models/meeting.js";
 import AgendaItem from "../models/agendaItem.js";
+import Decision from "../models/decision.js";
+import Information from "../models/information.js";
 import { protocolsDir } from "../middleware/upload.js";
 import { notifyChange } from "../config/socket.js";
 
@@ -91,6 +93,26 @@ export async function createMeeting(req, res) {
 // UPDATE meeting
 export async function updateMeeting(req, res) {
   try {
+    // Beim Verschieben müssen beide Zeitpunkte gesetzt sein und das Ende muss
+    // nach dem Beginn liegen (die Validierung im Schema greift bei Updates nicht)
+    if (req.body.startsAt || req.body.endsAt) {
+      const existing = await Meeting.findById(req.params.id);
+      if (!existing) {
+        return res.status(404).json({
+          message: "Meeting not found",
+        });
+      }
+
+      const startsAt = new Date(req.body.startsAt || existing.startsAt);
+      const endsAt = new Date(req.body.endsAt || existing.endsAt);
+
+      if (isNaN(startsAt) || isNaN(endsAt) || endsAt <= startsAt) {
+        return res.status(400).json({
+          message: "End date must be after start date",
+        });
+      }
+    }
+
     const updatedMeeting = await Meeting.findByIdAndUpdate(
       req.params.id,
       req.body,
@@ -195,6 +217,26 @@ export async function deleteMeeting(req, res) {
       const filePath = path.join(protocolsDir, deletedMeeting.protocolFileName);
       if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
     }
+
+    // Traktanden, Entscheide und Informationen gehören fest zum Meeting und
+    // werden mitgelöscht. Pendenzen bleiben bestehen und werden nur vom
+    // Meeting gelöst (sie erscheinen danach wieder über ihr Fälligkeitsdatum).
+    const agendaItemIds = (
+      await AgendaItem.find({ meetingId: deletedMeeting._id }, "_id")
+    ).map((item) => item._id);
+
+    await Decision.deleteMany({ meetingId: deletedMeeting._id });
+    await Information.deleteMany({ meetingId: deletedMeeting._id });
+    await AgendaItem.deleteMany({ meetingId: deletedMeeting._id });
+    await Task.updateMany(
+      {
+        $or: [
+          { meetingId: deletedMeeting._id },
+          { agendaItemId: { $in: agendaItemIds } },
+        ],
+      },
+      { $unset: { meetingId: "", agendaItemId: "" } },
+    );
 
     notifyChange("meeting", "deleted", deletedMeeting._id);
     res.status(200).json({

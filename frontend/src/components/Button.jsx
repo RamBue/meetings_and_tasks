@@ -1,18 +1,26 @@
 import Button from "react-bootstrap/Button";
 import { Link } from "react-router";
 
-function ActiveButton({ text, to, disabled = false }) {
+// variant "accent": Logo-Grün (nur für Pendenz-Themen), "primary": Blau (z.B. Meetings)
+function ActiveButton({ text, to, disabled = false, variant = "accent" }) {
+  const isAccent = variant === "accent";
+
   return (
     <Button
       as={disabled ? undefined : Link}
       to={disabled ? undefined : to}
       disabled={disabled}
-      style={{
-        color: disabled ? "#6c757d" : "black",
-        backgroundColor: disabled ? "#e9ecef" : "#A8CF44",
-        borderColor: disabled ? "#6c757d" : "#A8CF44",
-        cursor: disabled ? "not-allowed" : "pointer",
-      }}
+      variant={isAccent ? undefined : variant}
+      style={
+        isAccent
+          ? {
+              color: disabled ? "#6c757d" : "black",
+              backgroundColor: disabled ? "#e9ecef" : "#A8CF44",
+              borderColor: disabled ? "#6c757d" : "#A8CF44",
+              cursor: disabled ? "not-allowed" : "pointer",
+            }
+          : undefined
+      }
     >
       {text}
     </Button>

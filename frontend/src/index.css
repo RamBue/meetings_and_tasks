@@ -142,3 +142,8 @@ h2.page-title {
   --bs-btn-disabled-bg: transparent;
   --bs-btn-disabled-border-color: transparent;
 }
+
+/* Bearbeiten-Button im Meeting-Kopf: Oberkante auf Höhe der Oberkante der Titel-Grossbuchstaben (Titel h2 = 32px Schrift, 1.2 Zeilenhöhe) */
+.btn-kopf-edit {
+  margin-top: 0.55rem;
+}
