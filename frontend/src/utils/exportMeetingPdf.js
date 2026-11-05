@@ -12,16 +12,18 @@ const TOP = 15;
 const BOTTOM = PAGE_H - 18;
 const PT = 0.3528; // 1 pt in mm
 
-// Farben wie auf der Seite (Bootstrap)
+// Farben wie auf der Seite: Grün (Logo) nur für Pendenzen, sonst neutrale Grautöne
 const WHITE = [255, 255, 255];
-const LIGHT = [248, 249, 250];
-const BORDER = [222, 226, 230];
+const LIGHT = [227, 231, 235]; // graue Karten (Traktanden, fällige Pendenzen)
+const BORDER = [173, 181, 189]; // Rahmen der Karten
 const TEXT = [33, 37, 41];
 const MUTED = [108, 117, 125];
-const PRIMARY = [13, 110, 253];
-const SECONDARY = [108, 117, 125];
-const INFO = [13, 202, 240];
-const CHECK_BORDER = [173, 181, 189];
+const ACCENT = [167, 201, 71]; // Logo-Grün: Pendenz-Badge, erledigte Pendenz
+const ACCENT_TEXT = [16, 21, 37]; // Logo-Dunkelblau: Schrift auf Grün
+const SOFT = [222, 226, 230]; // Badges für Entscheid und Information
+const SOFT_TEXT = [52, 58, 64];
+const NEUTRAL = [108, 117, 125]; // Häkchen "Protokoll genehmigt"
+const CHECK_BORDER = [108, 117, 125]; // Rahmen leerer Checkboxen
 
 function hexToRgb(hex) {
   const value = parseInt(hex.replace("#", ""), 16);
@@ -161,10 +163,15 @@ export async function exportMeetingPdf({
     });
   };
 
-  const drawCheckbox = (x, top, checked) => {
+  // variant "accent": erledigte Pendenz (grün mit dunklem Häkchen),
+  // "neutral": z.B. Protokoll genehmigt (grau mit weissem Häkchen)
+  const drawCheckbox = (x, top, checked, variant = "accent") => {
+    const fill = variant === "neutral" ? NEUTRAL : ACCENT;
+    const tick = variant === "neutral" ? WHITE : ACCENT_TEXT;
+
     if (checked) {
-      doc.setFillColor(...PRIMARY);
-      doc.setDrawColor(...PRIMARY);
+      doc.setFillColor(...fill);
+      doc.setDrawColor(...fill);
     } else {
       doc.setFillColor(...WHITE);
       doc.setDrawColor(...CHECK_BORDER);
@@ -172,7 +179,7 @@ export async function exportMeetingPdf({
     doc.setLineWidth(0.3);
     doc.roundedRect(x, top, 4, 4, 0.7, 0.7, "FD");
     if (checked) {
-      doc.setDrawColor(...WHITE);
+      doc.setDrawColor(...tick);
       doc.setLineWidth(0.5);
       doc.line(x + 0.9, top + 2.2, x + 1.7, top + 3);
       doc.line(x + 1.7, top + 3, x + 3.2, top + 1.1);
@@ -241,7 +248,7 @@ export async function exportMeetingPdf({
         cy += 4.6 + 1.2;
       } else if (item.type === "check") {
         add(textZ, () => {
-          drawCheckbox(tx, itemTop, item.checked);
+          drawCheckbox(tx, itemTop, item.checked, "neutral");
           drawLines([item.label], tx + 6, itemTop - 0.2, 10, false, TEXT, false);
         });
         cy += 5 + 1.2;
@@ -269,7 +276,7 @@ export async function exportMeetingPdf({
   const taskCard = (task) =>
     leafCard(
       [
-        badge("Pendenz", SECONDARY),
+        badge("Pendenz", ACCENT, ACCENT_TEXT),
         text(task.title, {
           size: 11,
           bold: true,
@@ -348,17 +355,13 @@ export async function exportMeetingPdf({
     });
     add(textZ, () => {
       let cy = top + pad;
-      drawLines([isMinutes ? "PROTOKOLL" : "EINLADUNG"], x + pad, cy, 8, true, [
-        215, 215, 215,
-      ]);
+      drawLines([isMinutes ? "PROTOKOLL" : "EINLADUNG"], x + pad, cy, 8, true, WHITE);
       cy += lineHeight(8) + 1;
       drawLines(titleLines, x + pad, cy, 20, true, WHITE);
       cy += titleLines.length * lineHeight(20) + 1.5;
-      drawLines([when], x + pad, cy, 10, false, [215, 215, 215]);
+      drawLines([when], x + pad, cy, 10, false, WHITE);
       cy += lineHeight(10);
-      drawLines([meeting.location || "Kein Ort erfasst"], x + pad, cy, 10, false, [
-        215, 215, 215,
-      ]);
+      drawLines([meeting.location || "Kein Ort erfasst"], x + pad, cy, 10, false, WHITE);
 
       cy = top + headerH + pad;
       drawLines(["Besetzung"], x + pad, cy, 14, true, TEXT);
@@ -437,14 +440,14 @@ export async function exportMeetingPdf({
 
       decisions.forEach((decision) =>
         leafCard([
-          badge("Entscheid", PRIMARY),
+          badge("Entscheid", SOFT, SOFT_TEXT),
           text(`Nr. ${decision.number}: ${decision.topic}`, { size: 11, bold: true }),
           ...(decision.description ? [text(decision.description)] : []),
         ]),
       );
       informations.forEach((information) =>
         leafCard([
-          badge("Information", INFO, TEXT),
+          badge("Information", SOFT, SOFT_TEXT),
           text(information.topic, { size: 11, bold: true }),
           ...(information.description ? [text(information.description)] : []),
         ]),

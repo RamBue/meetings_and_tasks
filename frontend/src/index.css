@@ -147,3 +147,12 @@ h2.page-title {
 .btn-kopf-edit {
   margin-top: 0.55rem;
 }
+
+/* Hilfe-Symbol im Footer: neutrales Grau (Grün ist Pendenzen vorbehalten), beim Darüberfahren heller */
+.footer-help {
+  color: #adb5bd;
+}
+
+.footer-help:hover {
+  color: #e9ecef;
+}

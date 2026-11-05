@@ -2,9 +2,9 @@ import Container from "react-bootstrap/Container";
 import { FaQuestionCircle } from "react-icons/fa";
 import { MANUAL_URL, SUPPORT_EMAIL } from "../config/links";
 
-// Farben aus dem officimo-Logo: Dunkelblau und Grün
+// Dunkelblau aus dem officimo-Logo. Grün bleibt den Pendenzen vorbehalten,
+// die Hilfe ist neutral und erscheint deshalb grau.
 const LOGO_DARK = "#101525";
-const LOGO_GREEN = "#a7c947";
 
 function Footer() {
   return (
@@ -22,8 +22,7 @@ function Footer() {
           href={MANUAL_URL}
           target="_blank"
           rel="noreferrer"
-          className="fs-5 lh-1"
-          style={{ color: LOGO_GREEN }}
+          className="footer-help fs-5 lh-1"
           title="Anleitung öffnen"
           aria-label="Anleitung öffnen"
         >

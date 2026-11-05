@@ -48,7 +48,7 @@ function TasksTable({ tasks, loadTasks }) {
             <th>Beschreibung</th>
             <th>Verantwortlich</th>
             <th>Fällig am</th>
-            <th>Bearbeiten</th>
+            <th className="text-center">Bearbeiten</th>
             <th>Erledigt</th>
           </tr>
         </thead>
@@ -69,8 +69,9 @@ function TasksTable({ tasks, loadTasks }) {
               <td>{task.description}</td>
               <td>{task.assignedUser}</td>
               <td>{new Date(task.dueDate).toLocaleDateString("de-CH")}</td>
-              <td>
+              <td className="text-center align-middle">
                 <FaEdit
+                  className="d-block mx-auto"
                   style={{ cursor: "pointer" }}
                   onClick={() => handleEdit(task)}
                 />
