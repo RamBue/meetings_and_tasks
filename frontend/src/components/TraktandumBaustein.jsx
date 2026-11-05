@@ -405,19 +405,22 @@ function TraktandumBaustein({
             {activeForm === null && (
               <Stack direction="horizontal" gap={2}>
                 <Button
-                  variant="outline-primary"
+                  variant="light"
+                  className="btn-soft"
                   onClick={() => setActiveForm("entscheid")}
                 >
                   Entscheid hinzufügen
                 </Button>
                 <Button
-                  variant="outline-primary"
+                  variant="light"
+                  className="btn-soft"
                   onClick={() => setActiveForm("information")}
                 >
                   Information hinzufügen
                 </Button>
                 <Button
-                  variant="primary"
+                  variant="success"
+                  className="btn-accent"
                   onClick={() => setActiveForm("pendenz")}
                 >
                   Pendenz hinzufügen

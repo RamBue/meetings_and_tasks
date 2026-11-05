@@ -102,11 +102,11 @@ function PendenzBaustein({
               checked={task.status === "done"}
               onChange={toggleDone}
               title="Als erledigt markieren"
-              className="mt-1"
+              className="mt-1 check-accent"
             />
 
             <div className="flex-grow-1">
-              <Badge bg="secondary" className="mb-1">
+              <Badge bg={null} className="badge-accent mb-1">
                 Pendenz
               </Badge>
               <Card.Title
@@ -148,7 +148,7 @@ function PendenzBaustein({
   return (
     <Card className="mb-3">
       <Card.Body>
-        <Badge bg="secondary" className="mb-2">
+        <Badge bg={null} className="badge-accent mb-2">
           Pendenz
         </Badge>
         <Form onSubmit={handleSave}>
@@ -195,7 +195,12 @@ function PendenzBaustein({
           {error && <div className="text-danger mb-2">{error}</div>}
 
           <Stack direction="horizontal" gap={2}>
-            <Button type="submit" variant="primary" disabled={saving}>
+            <Button
+              type="submit"
+              variant="success"
+              className="btn-accent"
+              disabled={saving}
+            >
               {isNew ? "Pendenz hinzufügen" : "Speichern"}
             </Button>
 

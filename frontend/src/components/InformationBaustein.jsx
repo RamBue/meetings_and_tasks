@@ -75,7 +75,7 @@ function InformationBaustein({
         <Card.Body>
           <Stack direction="horizontal" gap={3} className="align-items-start">
             <div className="flex-grow-1">
-              <Badge bg="info" text="dark" className="mb-1">
+              <Badge bg={null} className="badge-soft mb-1">
                 Information
               </Badge>
               <Card.Title>{information.topic}</Card.Title>
@@ -102,7 +102,7 @@ function InformationBaustein({
   return (
     <Card className="mb-3">
       <Card.Body>
-        <Badge bg="info" text="dark" className="mb-2">
+        <Badge bg={null} className="badge-soft mb-2">
           Information
         </Badge>
         <Form onSubmit={handleSave}>

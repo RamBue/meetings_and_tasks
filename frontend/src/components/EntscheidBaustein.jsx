@@ -65,7 +65,7 @@ function EntscheidBaustein({
         <Card.Body>
           <Stack direction="horizontal" gap={3} className="align-items-start">
             <div className="flex-grow-1">
-              <Badge bg="primary" className="mb-1">
+              <Badge bg={null} className="badge-soft mb-1">
                 Entscheid
               </Badge>
               <Card.Title>
@@ -94,7 +94,7 @@ function EntscheidBaustein({
   return (
     <Card className="mb-3">
       <Card.Body>
-        <Badge bg="primary" className="mb-2">
+        <Badge bg={null} className="badge-soft mb-2">
           Entscheid
         </Badge>
         <Form onSubmit={handleSave}>

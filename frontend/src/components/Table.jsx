@@ -80,6 +80,7 @@ function TasksTable({ tasks, loadTasks }) {
                   type="checkbox"
                   checked={task.status === "done"}
                   onChange={() => toggleTaskStatus(task)}
+                  className="check-accent"
                 />
               </td>
             </tr>

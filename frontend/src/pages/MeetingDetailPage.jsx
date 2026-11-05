@@ -84,12 +84,12 @@ function MeetingDetailPage() {
   };
 
   if (loading) {
-    return <Container className="mt-4">Lade Meeting...</Container>;
+    return <Container className="page-top">Lade Meeting...</Container>;
   }
 
   if (error || !meeting) {
     return (
-      <Container className="mt-4">{error || "Meeting nicht gefunden"}</Container>
+      <Container className="page-top">{error || "Meeting nicht gefunden"}</Container>
     );
   }
 
@@ -97,7 +97,7 @@ function MeetingDetailPage() {
     CATEGORIES.find((c) => c.value === meeting.category)?.color || "#6c757d";
 
   return (
-    <Container className="mt-4">
+    <Container className="page-top">
       <div className="d-flex justify-content-between align-items-center">
         <Link to="/">&larr; Zurück zur Übersicht</Link>
 

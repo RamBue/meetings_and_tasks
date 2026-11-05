@@ -177,7 +177,7 @@ function FormCreateTask() {
           />
         </Form.Group>
 
-        <Button variant="primary" type="submit">
+        <Button variant="success" className="btn-accent" type="submit">
           {id ? "Task aktualisieren" : "Task erstellen"}
         </Button>
       </Form>

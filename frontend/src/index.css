@@ -19,9 +19,63 @@ div.card {
   --bs-btn-active-border-color: #b3bbc4;
 }
 
+/* Typ-Badges in den Traktanden: Entscheid und Information hellgrau, Pendenz in Logo-Grün */
+.badge.badge-soft {
+  background-color: #dee2e6;
+  color: #343a40;
+}
+
+.badge.badge-accent {
+  background-color: #a7c947;
+  color: #101525;
+}
+
+/* Checkboxen: Rahmen kräftiger als der Bootstrap-Standard, damit das Kästchen gut sichtbar ist */
+.form-check-input.form-check-input {
+  border-color: #6c757d;
+}
+
+/* Erledigt-Checkbox bei Pendenzen: Logo-Grün mit dunklem Häkchen */
+.check-accent .form-check-input:checked {
+  background-color: #a7c947;
+  border-color: #a7c947;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%23101525' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='m6 10 3 3 6-6'/%3e%3c/svg%3e");
+}
+
+.check-accent .form-check-input:focus {
+  border-color: #98b93c;
+  box-shadow: 0 0 0 0.25rem rgba(167, 201, 71, 0.35);
+}
+
+/* Neutrale Checkbox (z.B. Protokoll genehmigt): grau statt blau */
+.check-neutral .form-check-input:checked {
+  background-color: #6c757d;
+  border-color: #6c757d;
+}
+
+.check-neutral .form-check-input:focus {
+  border-color: #495057;
+  box-shadow: 0 0 0 0.25rem rgba(108, 117, 125, 0.3);
+}
+
+/* Datei-Auswahl-Button ("Durchsuchen") dunkler, damit die Fläche sichtbar ist */
+.form-control[type="file"]::file-selector-button {
+  background-color: #cdd3d9;
+  color: #343a40;
+}
+
+.form-control[type="file"]:hover:not(:disabled):not([readonly])::file-selector-button {
+  background-color: #bfc6ce;
+}
+
 /* Abstand zwischen Seiteninhalt und Footer */
 .app-main {
   padding-bottom: 2rem;
+}
+
+/* Abstand zur Navigationsleiste für Seiten ohne Titel (z.B. Meeting-Details), gleich gross wie bei den Seitenüberschriften */
+.page-top {
+  margin-top: 2rem;
 }
 
 /* Seitenüberschriften: fett, mit Abstand zur Navigationsleiste.
@@ -52,6 +106,22 @@ h2.page-title {
   --bs-btn-active-color: #212529;
   --bs-btn-active-bg: #ced4da;
   --bs-btn-active-border-color: #ced4da;
+  --bs-btn-disabled-color: #6c757d;
+  --bs-btn-disabled-bg: transparent;
+  --bs-btn-disabled-border-color: #ced4da;
+}
+
+/* Button in Logo-Grün, passend zum Pendenz-Badge */
+.btn.btn-accent {
+  --bs-btn-color: #101525;
+  --bs-btn-bg: #a7c947;
+  --bs-btn-border-color: #a7c947;
+  --bs-btn-hover-color: #101525;
+  --bs-btn-hover-bg: #98b93c;
+  --bs-btn-hover-border-color: #98b93c;
+  --bs-btn-active-color: #101525;
+  --bs-btn-active-bg: #8aa934;
+  --bs-btn-active-border-color: #8aa934;
   --bs-btn-disabled-color: #6c757d;
   --bs-btn-disabled-bg: transparent;
   --bs-btn-disabled-border-color: #ced4da;

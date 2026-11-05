@@ -128,6 +128,7 @@ function ProtokollBaustein({ meeting, onSaved }) {
               label="Protokoll genehmigt"
               checked={!!meeting.protocolApproved}
               onChange={toggleApproved}
+              className="check-neutral"
             />
 
             <div>
