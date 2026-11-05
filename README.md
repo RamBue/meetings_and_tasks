@@ -16,7 +16,7 @@ Heute werden Einladungen, Traktandenlisten, Protokolle und Pendenzenlisten in Wo
 
 **Zusätzlich aus Etappe 2**
 
-- Traktanden mit Entscheiden, Informationen und Pendenzen
+- Traktanden mit Entscheiden, Informationen und Pendenzen, inklusive Löschen und Verschieben in ein anderes Meeting (nur solange das Traktandum leer ist)
 - Besetzung mit Dropdown und Mehrfachauswahl
 - Protokoll-PDF hochladen, Genehmigung und Korrekturen erfassen
 - PDF-Export der Meeting-Detailseite als Einladung oder Protokoll
@@ -149,6 +149,9 @@ Meeting ──< AgendaItem (Traktandum) ──< Decision (Entscheid)
 - Ein Traktandum gehört zu einem Meeting und hat Verantwortliche sowie geplante und effektive Zeiten.
 - Entscheide, Informationen und Pendenzen können einem Traktandum zugeordnet sein.
 - **Zuordnung der Pendenzen:** Auf der Meeting-Detailseite erscheinen Pendenzen ohne Traktandum anhand ihres Fälligkeitsdatums. Fällt es auf den Tag des Meetings, erscheint die Pendenz dort. Wer das Datum ändert, verschiebt die Pendenz damit automatisch in das passende Meeting.
+- **Traktandum verschieben:** Im Bearbeiten-Formular eines Traktandums steht das Meeting-Datum. Ein anderes Datum verschiebt das Traktandum in das Meeting, das an diesem Tag stattfindet. Gibt es an dem Tag kein Meeting, erscheint eine Meldung. Bei mehreren Meetings am selben Tag gilt dasjenige mit derselben Kategorie, sonst bleibt die Zuordnung offen.
+- **Traktandum löschen:** Mit dem Knopf «Löschen» beim Traktandum, nach einer Rückfrage.
+- **Sperre:** Verschieben und Löschen sind nur möglich, solange das Traktandum keinen Entscheid, keine Information und keine Pendenz enthält, denn dann hat das Meeting noch nicht stattgefunden. Das Backend erzwingt das (`409 Conflict`), das Frontend deaktiviert den Knopf und das Datumsfeld und erklärt den Grund.
 - Ein Hackolade-Export des Datenmodells liegt in [docs](docs/). Er enthält Meeting, Task und User, aber noch nicht Traktandum, Entscheid und Information.
 
 Die Kategorien mit ihren Farben stehen in `backend/src/config/categories.js` und `frontend/src/config/categories.js`.

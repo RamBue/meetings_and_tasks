@@ -18,6 +18,27 @@ export async function createAgendaItem(agendaItem) {
   return response.json();
 }
 
+// Das Backend antwortet mit 409, wenn das Traktandum schon Entscheide,
+// Informationen oder Pendenzen enthält und daher nicht mehr geändert wird
+function conflictError() {
+  const error = new Error(
+    "Das Traktandum enthält Entscheide, Informationen oder Pendenzen.",
+  );
+  error.conflict = true;
+  return error;
+}
+
+export async function deleteAgendaItem(id) {
+  const response = await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+
+  if (response.status === 409) throw conflictError();
+  if (!response.ok) {
+    throw new Error("Traktandum konnte nicht gelöscht werden");
+  }
+
+  return response.json();
+}
+
 export async function updateAgendaItem(id, updates) {
   const response = await fetch(`${API_URL}/${id}`, {
     method: "PUT",
@@ -27,6 +48,7 @@ export async function updateAgendaItem(id, updates) {
     body: JSON.stringify(updates),
   });
 
+  if (response.status === 409) throw conflictError();
   if (!response.ok) {
     throw new Error("Traktandum konnte nicht aktualisiert werden");
   }

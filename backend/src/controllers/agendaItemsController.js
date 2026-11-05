@@ -1,5 +1,21 @@
 import AgendaItem from "../models/agendaItem.js";
+import Meeting from "../models/meeting.js";
+import Decision from "../models/decision.js";
+import Information from "../models/information.js";
+import Task from "../models/task.js";
 import { notifyChange } from "../config/socket.js";
+
+// Ein Traktandum darf nur verschoben oder gelöscht werden, solange es noch keinen
+// Entscheid, keine Information und keine Pendenz enthält. Sobald etwas erfasst
+// ist, hat das Meeting stattgefunden bzw. wird protokolliert.
+async function hasContent(agendaItemId) {
+  const [decisions, informations, tasks] = await Promise.all([
+    Decision.exists({ agendaItemId }),
+    Information.exists({ agendaItemId }),
+    Task.exists({ agendaItemId }),
+  ]);
+  return Boolean(decisions || informations || tasks);
+}
 
 // GET all agenda items
 export async function getAllAgendaItems(req, res) {
@@ -62,13 +78,32 @@ export async function createAgendaItem(req, res) {
 // UPDATE agenda item
 export async function updateAgendaItem(req, res) {
   try {
+    const existing = await AgendaItem.findById(req.params.id);
+    if (!existing)
+      return res.status(404).json({ message: "Agenda item not found" });
+
+    // Ein anderes meetingId verschiebt das Traktandum in dieses Meeting
+    const targetMeetingId =
+      req.body.meetingId && String(req.body.meetingId) !== String(existing.meetingId)
+        ? req.body.meetingId
+        : null;
+
+    if (targetMeetingId) {
+      if (!(await Meeting.exists({ _id: targetMeetingId }))) {
+        return res.status(400).json({ message: "Target meeting not found" });
+      }
+      if (await hasContent(existing._id)) {
+        return res.status(409).json({
+          message: "Agenda item has content and cannot be moved",
+        });
+      }
+    }
+
     const updatedAgendaItem = await AgendaItem.findByIdAndUpdate(
       req.params.id,
       req.body,
-      { new: true },
+      { new: true, runValidators: true },
     ).populate("responsibleUser", "name");
-    if (!updatedAgendaItem)
-      return res.status(404).json({ message: "Agenda item not found" });
 
     notifyChange("agendaItem", "updated", updatedAgendaItem._id);
     res.status(200).json(updatedAgendaItem);
@@ -84,11 +119,18 @@ export async function updateAgendaItem(req, res) {
 // DELETE agenda item
 export async function deleteAgendaItem(req, res) {
   try {
-    const deletedAgendaItem = await AgendaItem.findByIdAndDelete(
-      req.params.id,
-    );
-    if (!deletedAgendaItem)
+    const existing = await AgendaItem.findById(req.params.id);
+    if (!existing)
       return res.status(404).json({ message: "Agenda item not found" });
+
+    if (await hasContent(existing._id)) {
+      return res.status(409).json({
+        message: "Agenda item has content and cannot be deleted",
+      });
+    }
+
+    const deletedAgendaItem = await AgendaItem.findByIdAndDelete(existing._id);
+
     notifyChange("agendaItem", "deleted", deletedAgendaItem._id);
     res.status(200).json({ message: "Agenda item deleted successfully!" });
   } catch (error) {

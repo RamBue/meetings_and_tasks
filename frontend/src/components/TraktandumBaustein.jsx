@@ -8,14 +8,48 @@ import Stack from "react-bootstrap/Stack";
 import { getUsers } from "../services/userService";
 import {
   createAgendaItem,
+  deleteAgendaItem,
   updateAgendaItem,
 } from "../services/agendaItemService";
+import { getMeetings } from "../services/meetingService";
+import { toLocalDateInput } from "../utils/dates";
 import { getDecisionsByAgendaItem } from "../services/decisionService";
 import { getInformationsByAgendaItem } from "../services/informationService";
 import { getTasksByAgendaItem } from "../services/taskService";
 import PendenzBaustein from "./PendenzBaustein";
 import EntscheidBaustein from "./EntscheidBaustein";
 import InformationBaustein from "./InformationBaustein";
+
+const LOCKED_MESSAGE =
+  "Das Traktandum enthält Entscheide, Informationen oder Pendenzen und kann nicht gelöscht oder verschoben werden.";
+
+function formatInputDate(date) {
+  const [year, month, day] = date.split("-");
+  return `${day}.${month}.${year}`;
+}
+
+// Sucht das Meeting, das am gewählten Tag stattfindet (ausser dem aktuellen).
+// Gibt es mehrere, gilt dasjenige mit derselben Kategorie.
+function findTargetMeeting(meetings, date, currentMeetingId, category) {
+  const onDay = meetings.filter(
+    (m) => m._id !== currentMeetingId && toLocalDateInput(m.startsAt) === date,
+  );
+
+  if (onDay.length === 0) {
+    return { error: `Am ${formatInputDate(date)} findet kein Meeting statt.` };
+  }
+  if (onDay.length === 1) {
+    return { meeting: onDay[0] };
+  }
+
+  const sameCategory = onDay.filter((m) => m.category === category);
+  if (sameCategory.length === 1) {
+    return { meeting: sameCategory[0] };
+  }
+  return {
+    error: `Am ${formatInputDate(date)} gibt es mehrere Meetings. Das Traktandum kann nicht eindeutig zugeordnet werden.`,
+  };
+}
 
 function TraktandumBaustein({
   agendaItem,
@@ -38,6 +72,8 @@ function TraktandumBaustein({
   const [plannedTo, setPlannedTo] = useState(agendaItem?.plannedTo || "");
   const [actualFrom, setActualFrom] = useState(agendaItem?.actualFrom || "");
   const [actualTo, setActualTo] = useState(agendaItem?.actualTo || "");
+  const currentDate = meetingStartsAt ? toLocalDateInput(meetingStartsAt) : "";
+  const [meetingDate, setMeetingDate] = useState(currentDate);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
@@ -45,6 +81,10 @@ function TraktandumBaustein({
   const [decisions, setDecisions] = useState([]);
   const [informations, setInformations] = useState([]);
   const [tasks, setTasks] = useState([]);
+
+  // Löschen und Verschieben sind nur möglich, solange noch nichts erfasst ist
+  const hasContent =
+    decisions.length > 0 || informations.length > 0 || tasks.length > 0;
 
   useEffect(() => {
     getUsers()
@@ -88,6 +128,7 @@ function TraktandumBaustein({
     setPlannedTo(agendaItem?.plannedTo || "");
     setActualFrom(agendaItem?.actualFrom || "");
     setActualTo(agendaItem?.actualTo || "");
+    setMeetingDate(currentDate);
     setError("");
   };
 
@@ -101,6 +142,30 @@ function TraktandumBaustein({
     setSaving(true);
     setError("");
 
+    // Anderes Datum gewählt: Traktandum in das Meeting an diesem Tag verschieben
+    let targetMeetingId = meetingId;
+    if (!isNew && meetingDate && meetingDate !== currentDate) {
+      try {
+        const result = findTargetMeeting(
+          await getMeetings(),
+          meetingDate,
+          meetingId,
+          meetingCategory,
+        );
+        if (result.error) {
+          setError(result.error);
+          setSaving(false);
+          return;
+        }
+        targetMeetingId = result.meeting._id;
+      } catch (err) {
+        console.error(err);
+        setError("Meetings konnten nicht geladen werden");
+        setSaving(false);
+        return;
+      }
+    }
+
     const payload = {
       title,
       responsibleUser: responsibleUser || null,
@@ -108,7 +173,7 @@ function TraktandumBaustein({
       plannedTo,
       actualFrom,
       actualTo,
-      meetingId,
+      meetingId: targetMeetingId,
     };
 
     try {
@@ -122,8 +187,26 @@ function TraktandumBaustein({
       onSaved();
     } catch (err) {
       console.error(err);
-      setError("Traktandum konnte nicht gespeichert werden");
+      setError(err.conflict ? LOCKED_MESSAGE : "Traktandum konnte nicht gespeichert werden");
     } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    const confirmed = window.confirm(
+      `Traktandum «${agendaItem.title}» wirklich löschen?`,
+    );
+    if (!confirmed) return;
+
+    setSaving(true);
+    setError("");
+    try {
+      await deleteAgendaItem(agendaItem._id);
+      onSaved();
+    } catch (err) {
+      console.error(err);
+      setError(err.conflict ? LOCKED_MESSAGE : "Traktandum konnte nicht gelöscht werden");
       setSaving(false);
     }
   };
@@ -170,6 +253,25 @@ function TraktandumBaustein({
                     </Form.Select>
                   </Form.Group>
                 </Col>
+
+                {!isNew && (
+                  <Col md={6}>
+                    <Form.Group className="mb-3">
+                      <Form.Label>Meeting-Datum</Form.Label>
+                      <Form.Control
+                        type="date"
+                        value={meetingDate}
+                        onChange={(e) => setMeetingDate(e.target.value)}
+                        disabled={hasContent}
+                      />
+                      <Form.Text className="text-muted">
+                        {hasContent
+                          ? "Verschieben ist nicht mehr möglich: Das Traktandum enthält Entscheide, Informationen oder Pendenzen."
+                          : "Ein anderes Datum verschiebt das Traktandum in das Meeting an diesem Tag."}
+                      </Form.Text>
+                    </Form.Group>
+                  </Col>
+                )}
               </Row>
 
               <Row>
@@ -228,13 +330,28 @@ function TraktandumBaustein({
             <>
               <div className="d-flex justify-content-between align-items-start mb-2">
                 <Card.Title className="mb-0">{agendaItem.title}</Card.Title>
-                <Button
-                  variant="outline-secondary"
-                  size="sm"
-                  onClick={() => setIsEditing(true)}
-                >
-                  Bearbeiten
-                </Button>
+                <Stack direction="horizontal" gap={2}>
+                  <Button
+                    variant="outline-secondary"
+                    size="sm"
+                    onClick={() => setIsEditing(true)}
+                  >
+                    Bearbeiten
+                  </Button>
+                  <Button
+                    variant="outline-danger"
+                    size="sm"
+                    onClick={handleDelete}
+                    disabled={saving || hasContent}
+                    title={
+                      hasContent
+                        ? "Nicht möglich: Das Traktandum enthält Entscheide, Informationen oder Pendenzen."
+                        : undefined
+                    }
+                  >
+                    Löschen
+                  </Button>
+                </Stack>
               </div>
 
               <Card.Text className="text-muted mb-0">
@@ -250,6 +367,8 @@ function TraktandumBaustein({
                     : "–"}
                 </small>
               </Card.Text>
+
+              {error && <div className="text-danger mt-2">{error}</div>}
             </>
           )}
         </div>
