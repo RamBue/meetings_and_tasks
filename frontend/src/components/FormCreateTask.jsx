@@ -5,6 +5,7 @@ import Form from "react-bootstrap/Form";
 import Container from "react-bootstrap/Container";
 import { API_BASE_URL } from "../config/api";
 import { apiFetch } from "../services/apiFetch";
+import { apiError, errorMessage } from "../services/apiError";
 
 function FormCreateTask() {
   const navigate = useNavigate();
@@ -16,18 +17,22 @@ function FormCreateTask() {
   const [description, setDescription] = useState("");
   const [responsible, setResponsible] = useState("");
   const [dueDate, setDueDate] = useState("");
+  const [error, setError] = useState("");
 
   // Kategorien laden
   useEffect(() => {
     apiFetch(`${API_BASE_URL}/api/categories`)
-      .then((res) => {
+      .then(async (res) => {
         if (!res.ok) {
-          throw new Error("Fehler beim Laden der Kategorien");
+          throw await apiError(res, "Kategorien konnten nicht geladen werden");
         }
         return res.json();
       })
       .then((data) => setCategories(data))
-      .catch((err) => console.error(err));
+      .catch((err) => {
+        console.error(err);
+        setError(errorMessage(err, "Kategorien konnten nicht geladen werden"));
+      });
   }, []);
 
   // Task laden, falls Bearbeitungsmodus
@@ -39,7 +44,7 @@ function FormCreateTask() {
         const response = await apiFetch(`${API_BASE_URL}/api/tasks/${id}`);
 
         if (!response.ok) {
-          throw new Error("Task konnte nicht geladen werden");
+          throw await apiError(response, "Pendenz konnte nicht geladen werden");
         }
 
         const task = await response.json();
@@ -53,8 +58,9 @@ function FormCreateTask() {
             ? new Date(task.dueDate).toISOString().split("T")[0]
             : "",
         );
-      } catch (error) {
-        console.error(error);
+      } catch (err) {
+        console.error(err);
+        setError(errorMessage(err, "Pendenz konnte nicht geladen werden"));
       }
     };
 
@@ -63,6 +69,7 @@ function FormCreateTask() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
 
     const task = {
       category,
@@ -89,7 +96,7 @@ function FormCreateTask() {
       });
 
       if (!response.ok) {
-        throw new Error("Task konnte nicht gespeichert werden");
+        throw await apiError(response, "Pendenz konnte nicht gespeichert werden");
       }
 
       navigate("/tasks", {
@@ -108,9 +115,9 @@ function FormCreateTask() {
         setResponsible("");
         setDueDate("");
       }
-    } catch (error) {
-      console.error(error);
-      alert("Fehler beim Speichern");
+    } catch (err) {
+      console.error(err);
+      setError(errorMessage(err, "Pendenz konnte nicht gespeichert werden"));
     }
   };
 
@@ -177,6 +184,12 @@ function FormCreateTask() {
             onChange={(e) => setDueDate(e.target.value)}
           />
         </Form.Group>
+
+        {error && (
+          <div className="text-danger mb-3" role="alert">
+            {error}
+          </div>
+        )}
 
         <Button variant="success" className="btn-accent" type="submit">
           {id ? "Task aktualisieren" : "Task erstellen"}

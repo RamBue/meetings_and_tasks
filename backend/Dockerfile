@@ -10,6 +10,9 @@ COPY --chown=node:node . .
 # Upload-Ordner anlegen, damit der User "node" hineinschreiben darf
 RUN mkdir -p uploads/protocols && chown -R node:node uploads
 
+# Produktionsmodus: weniger Details in Fehlermeldungen, schnellerer Betrieb
+ENV NODE_ENV=production
+
 USER node
 EXPOSE 5002
 CMD ["node", "src/server.js"]

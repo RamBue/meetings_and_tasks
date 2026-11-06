@@ -6,6 +6,7 @@ import Col from "react-bootstrap/Col";
 import { getUsers } from "../services/userService";
 import { updateMeeting } from "../services/meetingService";
 import MultiUserSelect from "./MultiUserSelect";
+import { errorMessage } from "../services/apiError";
 
 function names(users) {
   return users && users.length > 0 ? users.map((u) => u.name).join(", ") : "–";
@@ -64,7 +65,7 @@ function MeetingRollenBaustein({ meeting, onSaved }) {
       onSaved();
     } catch (err) {
       console.error(err);
-      setError("Angaben konnten nicht gespeichert werden");
+      setError(errorMessage(err, "Angaben konnten nicht gespeichert werden"));
     } finally {
       setSaving(false);
     }

@@ -7,6 +7,7 @@ import Information from "../models/information.js";
 import { protocolFilePath } from "../middleware/upload.js";
 import { notifyChange } from "../config/socket.js";
 import { pick } from "../utils/sanitize.js";
+import { handleError } from "../utils/errors.js";
 
 // Felder, die ein Client setzen darf. Die Angaben zur hochgeladenen Datei
 // (protocolFileName, protocolOriginalName, protocolUploadedAt) setzt nur der Server.
@@ -58,10 +59,7 @@ export async function getMeetings(req, res) {
     res.status(200).json(meetings);
   } catch (error) {
     console.error("Error in getMeetings controller", error);
-
-    res.status(500).json({
-      message: "Internal server error",
-    });
+    handleError(res, error);
   }
 }
 
@@ -105,10 +103,7 @@ export async function getMeetingById(req, res) {
     res.status(200).json({ meeting, tasks, agendaItems });
   } catch (error) {
     console.error("Error in getMeetingById controller", error);
-
-    res.status(500).json({
-      message: "Internal server error",
-    });
+    handleError(res, error);
   }
 }
 
@@ -123,11 +118,10 @@ export async function createMeeting(req, res) {
 
     notifyChange("meeting", "created", savedMeeting._id);
     res.status(201).json(savedMeeting);
-  } catch (error) { console.error("Error in createMeeting controller", error); 
-    // Mongoose Validation Error 
-    if (error.name === "ValidationError") { return res.status(400).json({ message: error.message, }); } 
-    // Fallback 
-    res.status(500).json({ message: "Internal server error", }); }
+  } catch (error) {
+    console.error("Error in createMeeting controller", error);
+    handleError(res, error);
+  }
 }
 
 // UPDATE meeting
@@ -171,11 +165,10 @@ export async function updateMeeting(req, res) {
 
     notifyChange("meeting", "updated", updatedMeeting._id);
     res.status(200).json(updatedMeeting);
-  } catch (error) { console.error("Error in updateMeeting controller", error); 
-    // Mongoose Validation Error 
-    if (error.name === "ValidationError") { return res.status(400).json({ message: error.message, }); } 
-    // Fallback 
-    res.status(500).json({ message: "Internal server error", }); }
+  } catch (error) {
+    console.error("Error in updateMeeting controller", error);
+    handleError(res, error);
+  }
 }
 
 // UPLOAD meeting protocol PDF
@@ -192,7 +185,8 @@ export async function uploadMeetingProtocol(req, res) {
 
     if (!req.file) {
       return res.status(400).json({
-        message: "Es wurde keine PDF-Datei übermittelt",
+        message: "No PDF file provided",
+        code: "no_file",
       });
     }
 
@@ -200,7 +194,8 @@ export async function uploadMeetingProtocol(req, res) {
     if (!isPdfFile(req.file.path)) {
       fs.unlinkSync(req.file.path);
       return res.status(400).json({
-        message: "Nur PDF-Dateien sind erlaubt",
+        message: "Only PDF files are allowed",
+        code: "not_pdf",
       });
     }
 
@@ -218,10 +213,7 @@ export async function uploadMeetingProtocol(req, res) {
     res.status(200).json(meeting);
   } catch (error) {
     console.error("Error in uploadMeetingProtocol controller", error);
-
-    res.status(500).json({
-      message: "Internal server error",
-    });
+    handleError(res, error);
   }
 }
 
@@ -234,17 +226,14 @@ export async function downloadMeetingProtocol(req, res) {
 
     if (!filePath || !fs.existsSync(filePath)) {
       return res.status(404).json({
-        message: "Für dieses Meeting wurde noch kein Protokoll hochgeladen",
+        message: "No protocol uploaded for this meeting",
       });
     }
 
     res.download(filePath, meeting.protocolOriginalName || "protokoll.pdf");
   } catch (error) {
     console.error("Error in downloadMeetingProtocol controller", error);
-
-    res.status(500).json({
-      message: "Internal server error",
-    });
+    handleError(res, error);
   }
 }
 
@@ -287,9 +276,6 @@ export async function deleteMeeting(req, res) {
     });
   } catch (error) {
     console.error("Error in deleteMeeting controller", error);
-
-    res.status(500).json({
-      message: "Internal server error",
-    });
+    handleError(res, error);
   }
 }

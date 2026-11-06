@@ -169,6 +169,24 @@ Alle Routen liegen unter `/api` und verlangen eine Anmeldung (siehe oben). Die R
 | `/api/users` | Benutzer | `GET` und `POST` |
 | `/api/categories` | Meeting-Kategorien | `GET` |
 
+## Fehlerbehandlung
+
+Das Backend antwortet bei Fehlern immer mit JSON und verrät nichts über Server oder Datenbank (keine Stacktraces, Pfade oder Datenbanktexte; Details stehen nur im Log):
+
+| Status | Wann | Antwort |
+|---|---|---|
+| 400 | Prüffehler | `{ "message": "Validation failed", "errors": [{ "field": "title", "code": "too_short", "min": 3 }] }`. Codes: `required`, `too_short`, `too_long`, `invalid`, `invalid_format` |
+| 400 | ungültiges JSON, ungültige ID oder Parameter | `{ "message": "Invalid JSON" }` bzw. `{ "message": "Invalid value", "errors": [...] }` |
+| 400 / 413 | Protokoll-Upload | `{ "message": "...", "code": "not_pdf" \| "file_too_large" \| "no_file" }` |
+| 401 | fehlende oder ungültige Anmeldung | `{ "message": "Unauthorized" }` |
+| 404 | Eintrag oder Adresse unbekannt | `{ "message": "Not found" }` |
+| 409 | Eintrag existiert schon, Traktandum nicht mehr änderbar | `{ "message": "..." }` |
+| 413 | Anfrage zu gross | `{ "message": "Request too large" }` |
+| 429 | zu viele Anfragen oder Anmeldeversuche | `{ "message": "Too many requests" }` |
+| 500 | unerwarteter Fehler | `{ "message": "Internal server error" }` |
+
+Im Frontend übersetzt `services/apiError.js` diese Antworten in verständliche deutsche Meldungen, zum Beispiel «Pendenz konnte nicht gespeichert werden: Titel ist zu kurz (mindestens 3 Zeichen).» Ist der Server nicht erreichbar (etwa weil er auf dem Free-Plan schläft), erscheint ein entsprechender Hinweis. Unerwartete Darstellungsfehler fängt `components/ErrorBoundary.jsx` ab und zeigt statt eines weissen Bildschirms eine Fehlerseite mit «Seite neu laden».
+
 ## Datenmodell
 
 ```

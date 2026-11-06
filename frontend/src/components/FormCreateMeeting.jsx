@@ -10,6 +10,7 @@ import { getUsers } from "../services/userService";
 import { createMeeting } from "../services/meetingService";
 import MultiUserSelect from "./MultiUserSelect";
 import { apiFetch } from "../services/apiFetch";
+import { errorMessage } from "../services/apiError";
 
 function FormCreateMeeting() {
   const navigate = useNavigate();
@@ -83,7 +84,7 @@ function FormCreateMeeting() {
       navigate(`/meeting/${savedMeeting._id}`);
     } catch (err) {
       console.error(err);
-      setError("Fehler beim Speichern");
+      setError(errorMessage(err, "Meeting konnte nicht gespeichert werden"));
       setSaving(false);
     }
   };

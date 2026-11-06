@@ -8,6 +8,7 @@ import {
   uploadProtocol,
   downloadProtocol,
 } from "../services/meetingService";
+import { errorMessage } from "../services/apiError";
 
 function ProtokollBaustein({ meeting, onSaved }) {
   const [isEditing, setIsEditing] = useState(false);
@@ -35,7 +36,7 @@ function ProtokollBaustein({ meeting, onSaved }) {
       await downloadProtocol(meeting._id, meeting.protocolOriginalName);
     } catch (err) {
       console.error(err);
-      setError("Protokoll konnte nicht heruntergeladen werden");
+      setError(errorMessage(err, "Protokoll konnte nicht heruntergeladen werden"));
     }
   };
 
@@ -50,7 +51,7 @@ function ProtokollBaustein({ meeting, onSaved }) {
       onSaved();
     } catch (err) {
       console.error(err);
-      setError("Angaben konnten nicht gespeichert werden");
+      setError(errorMessage(err, "Angaben konnten nicht gespeichert werden"));
     } finally {
       setSaving(false);
     }
@@ -64,7 +65,7 @@ function ProtokollBaustein({ meeting, onSaved }) {
       onSaved();
     } catch (err) {
       console.error(err);
-      setError("Genehmigung konnte nicht gespeichert werden");
+      setError(errorMessage(err, "Genehmigung konnte nicht gespeichert werden"));
     }
   };
 
@@ -80,7 +81,7 @@ function ProtokollBaustein({ meeting, onSaved }) {
       onSaved();
     } catch (err) {
       console.error(err);
-      setError("PDF konnte nicht hochgeladen werden");
+      setError(errorMessage(err, "PDF konnte nicht hochgeladen werden"));
     } finally {
       setUploading(false);
       e.target.value = "";

@@ -19,6 +19,7 @@ import { getTasksByAgendaItem } from "../services/taskService";
 import PendenzBaustein from "./PendenzBaustein";
 import EntscheidBaustein from "./EntscheidBaustein";
 import InformationBaustein from "./InformationBaustein";
+import { errorMessage } from "../services/apiError";
 
 const LOCKED_MESSAGE =
   "Das Traktandum enthält Entscheide, Informationen oder Pendenzen und kann nicht gelöscht oder verschoben werden.";
@@ -160,7 +161,7 @@ function TraktandumBaustein({
         targetMeetingId = result.meeting._id;
       } catch (err) {
         console.error(err);
-        setError("Meetings konnten nicht geladen werden");
+        setError(errorMessage(err, "Meetings konnten nicht geladen werden"));
         setSaving(false);
         return;
       }
@@ -187,7 +188,7 @@ function TraktandumBaustein({
       onSaved();
     } catch (err) {
       console.error(err);
-      setError(err.conflict ? LOCKED_MESSAGE : "Traktandum konnte nicht gespeichert werden");
+      setError(err.conflict ? LOCKED_MESSAGE : errorMessage(err, "Traktandum konnte nicht gespeichert werden"));
     } finally {
       setSaving(false);
     }
@@ -206,7 +207,7 @@ function TraktandumBaustein({
       onSaved();
     } catch (err) {
       console.error(err);
-      setError(err.conflict ? LOCKED_MESSAGE : "Traktandum konnte nicht gelöscht werden");
+      setError(err.conflict ? LOCKED_MESSAGE : errorMessage(err, "Traktandum konnte nicht gelöscht werden"));
       setSaving(false);
     }
   };

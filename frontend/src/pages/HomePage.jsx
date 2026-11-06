@@ -2,11 +2,13 @@ import { useEffect, useState } from "react";
 import MeetingOverview from "../components/MeetingOverview";
 import { getMeetings } from "../services/meetingService";
 import { useDataChanged } from "../hooks/useDataChanged";
+import { errorMessage } from "../services/apiError";
 
 const HomePage = () => {
   console.log("HomePage rendered");
   const [meetings, setMeetings] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("Alle");
 
   useEffect(() => {
@@ -20,9 +22,11 @@ const HomePage = () => {
         console.log("API RESULT:", data);
 
         setMeetings(data);
+        setLoadError("");
         console.log("Meetings gesetzt:", data);
       } catch (error) {
         console.error("Fehler beim Laden der Meetings:", error);
+        setLoadError(errorMessage(error, "Meetings konnten nicht geladen werden"));
       } finally {
         setLoading(false);
       }
@@ -71,7 +75,15 @@ const HomePage = () => {
           ))}
         </select>
       </div>
-      <MeetingOverview meetings={filteredMeetings} />
+      {loadError && (
+        <div className="text-danger mb-3" role="alert">
+          {loadError}
+        </div>
+      )}
+      {/* Bei einem Ladefehler nicht "Keine Meetings vorhanden" anzeigen */}
+      {(!loadError || meetings.length > 0) && (
+        <MeetingOverview meetings={filteredMeetings} />
+      )}
     </div>
   );
 };

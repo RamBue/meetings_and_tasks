@@ -5,6 +5,7 @@ import Information from "../models/information.js";
 import Task from "../models/task.js";
 import { notifyChange } from "../config/socket.js";
 import { isObjectIdString, pick } from "../utils/sanitize.js";
+import { handleError } from "../utils/errors.js";
 
 // Felder, die ein Client setzen darf
 const AGENDA_ITEM_FIELDS = [
@@ -46,10 +47,7 @@ export async function getAllAgendaItems(req, res) {
     res.status(200).json(agendaItems);
   } catch (error) {
     console.error("Error in getAllAgendaItems controller", error);
-
-    res.status(500).json({
-      message: "Internal server error",
-    });
+    handleError(res, error);
   }
 }
 
@@ -65,7 +63,7 @@ export async function getAgendaItemById(req, res) {
     res.json(agendaItem);
   } catch (error) {
     console.error("Error in getAgendaItemById controller", error);
-    res.status(500).json({ message: "Internal server error" });
+    handleError(res, error);
   }
 }
 
@@ -80,10 +78,7 @@ export async function createAgendaItem(req, res) {
     res.status(201).json(populated);
   } catch (error) {
     console.error("Error in createAgendaItem controller", error);
-    if (error.name === "ValidationError") {
-      return res.status(400).json({ message: error.message });
-    }
-    res.status(500).json({ message: "Internal server error" });
+    handleError(res, error);
   }
 }
 
@@ -127,10 +122,7 @@ export async function updateAgendaItem(req, res) {
     res.status(200).json(updatedAgendaItem);
   } catch (error) {
     console.error("Error in updateAgendaItem controller", error);
-    if (error.name === "ValidationError") {
-      return res.status(400).json({ message: error.message });
-    }
-    res.status(500).json({ message: "Internal server error" });
+    handleError(res, error);
   }
 }
 
@@ -153,6 +145,6 @@ export async function deleteAgendaItem(req, res) {
     res.status(200).json({ message: "Agenda item deleted successfully!" });
   } catch (error) {
     console.error("Error in deleteAgendaItem controller", error);
-    res.status(500).json({ message: "Internal server error" });
+    handleError(res, error);
   }
 }

@@ -1,6 +1,7 @@
 import Task from "../models/task.js";
 import { notifyChange } from "../config/socket.js";
 import { pick } from "../utils/sanitize.js";
+import { handleError } from "../utils/errors.js";
 
 // Felder, die ein Client setzen darf
 const TASK_FIELDS = [
@@ -47,10 +48,7 @@ export async function getAllTasks(req, res) {
     res.status(200).json(tasks);
   } catch (error) {
     console.error("Error in getTasks controller", error);
-
-    res.status(500).json({
-      message: "Internal server error",
-    });
+    handleError(res, error);
   }
 }
 
@@ -62,7 +60,7 @@ export async function getTaskById(req, res) {
     res.json(task);
   } catch (error) {
     console.error("Error in getAllTasks controller", error);
-    res.status(500).json({ message: "Internal server error" });
+    handleError(res, error);
   }
 }
 
@@ -76,12 +74,7 @@ export async function createTask(req, res) {
     res.status(201).json(savedTask);
   } catch (error) {
     console.error("Error in createTask controller", error);
-    // Mongoose Validation Error
-    if (error.name === "ValidationError") {
-      return res.status(400).json({ message: error.message });
-    }
-    // Fallback
-    res.status(500).json({ message: "Internal server error" });
+    handleError(res, error);
   }
 }
 
@@ -102,12 +95,7 @@ export async function updateTask(req, res) {
     res.status(200).json(updatedTask);
   } catch (error) {
     console.error("Error in updateTask controller", error);
-    // Mongoose Validation Error
-    if (error.name === "ValidationError") {
-      return res.status(400).json({ message: error.message });
-    }
-    // Fallback
-    res.status(500).json({ message: "Internal server error" });
+    handleError(res, error);
   }
 }
 
@@ -121,6 +109,6 @@ export async function deleteTask(req, res) {
     res.status(200).json({ message: "Task deleted successfully!" });
   } catch (error) {
     console.error("Error in deleteTask controller", error);
-    res.status(500).json({ message: "Internal server error" });
+    handleError(res, error);
   }
 }

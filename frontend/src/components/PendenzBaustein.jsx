@@ -5,6 +5,7 @@ import Button from "react-bootstrap/Button";
 import Stack from "react-bootstrap/Stack";
 import Badge from "react-bootstrap/Badge";
 import { createTask, updateTask } from "../services/taskService";
+import { errorMessage } from "../services/apiError";
 
 function toInputDate(date) {
   return date ? new Date(date).toISOString().split("T")[0] : "";
@@ -75,7 +76,7 @@ function PendenzBaustein({
       onSaved();
     } catch (err) {
       console.error(err);
-      setError("Pendenz konnte nicht gespeichert werden");
+      setError(errorMessage(err, "Pendenz konnte nicht gespeichert werden"));
     } finally {
       setSaving(false);
     }

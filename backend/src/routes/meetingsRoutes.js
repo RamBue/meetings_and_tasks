@@ -36,7 +36,19 @@ router.post(
   validateObjectId,
   (req, res, next) => {
     uploadProtocolPdf.single("pdf")(req, res, (err) => {
-      if (err) return res.status(400).json({ message: err.message });
+      if (err) {
+        if (err.code === "LIMIT_FILE_SIZE") {
+          return res
+            .status(413)
+            .json({ message: "File too large", code: "file_too_large" });
+        }
+        if (err.code === "NOT_PDF") {
+          return res
+            .status(400)
+            .json({ message: "Only PDF files are allowed", code: "not_pdf" });
+        }
+        return res.status(400).json({ message: "Invalid upload" });
+      }
       next();
     });
   },

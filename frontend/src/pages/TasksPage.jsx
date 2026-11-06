@@ -6,10 +6,12 @@ import { API_BASE_URL } from "../config/api";
 import { useDataChanged } from "../hooks/useDataChanged";
 import { exportTasksPdf } from "../utils/exportTasksPdf";
 import { apiFetch } from "../services/apiFetch";
+import { apiError, errorMessage } from "../services/apiError";
 
 const TasksPage = () => {
   const [tasks, setTasks] = useState([]);
   const [users, setUsers] = useState([]);
+  const [loadError, setLoadError] = useState("");
   const [statusFilter, setStatusFilter] = useState("open");
   const [userFilter, setUserFilter] = useState("");
   const location = useLocation();
@@ -33,16 +35,23 @@ const TasksPage = () => {
     }
 
     apiFetch(`${API_BASE_URL}/api/tasks?${params.toString()}`)
-      .then((response) => {
+      .then(async (response) => {
         if (!response.ok) {
-          throw new Error("Fehler beim Laden der Tasks");
+          throw await apiError(response, "Pendenzen konnten nicht geladen werden");
         }
         return response.json();
       })
       .then((data) => {
-        if (!cancelled) setTasks(data);
+        if (cancelled) return;
+        setTasks(data);
+        setLoadError("");
       })
-      .catch((error) => console.error(error));
+      .catch((error) => {
+        console.error(error);
+        if (!cancelled) {
+          setLoadError(errorMessage(error, "Pendenzen konnten nicht geladen werden"));
+        }
+      });
 
     return () => {
       cancelled = true;
@@ -55,9 +64,9 @@ const TasksPage = () => {
     let cancelled = false;
 
     apiFetch(`${API_BASE_URL}/api/tasks`)
-      .then((response) => {
+      .then(async (response) => {
         if (!response.ok) {
-          throw new Error("Fehler beim Laden der Verantwortlichen");
+          throw await apiError(response, "Verantwortliche konnten nicht geladen werden");
         }
         return response.json();
       })
@@ -94,6 +103,11 @@ const TasksPage = () => {
           style={{ padding: "4px 12px", fontSize: "0.875rem" }}
         >
           {location.state.message}
+        </Alert>
+      )}
+      {loadError && (
+        <Alert variant="danger" style={{ padding: "4px 12px", fontSize: "0.875rem" }}>
+          {loadError}
         </Alert>
       )}
       <Row className="mb-3">

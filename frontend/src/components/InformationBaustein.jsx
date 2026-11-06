@@ -8,6 +8,7 @@ import {
   createInformation,
   updateInformation,
 } from "../services/informationService";
+import { errorMessage } from "../services/apiError";
 
 function InformationBaustein({
   information,
@@ -63,7 +64,7 @@ function InformationBaustein({
       onSaved();
     } catch (err) {
       console.error(err);
-      setError("Information konnte nicht gespeichert werden");
+      setError(errorMessage(err, "Information konnte nicht gespeichert werden"));
     } finally {
       setSaving(false);
     }

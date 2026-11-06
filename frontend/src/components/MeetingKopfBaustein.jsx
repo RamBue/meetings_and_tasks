@@ -6,6 +6,7 @@ import Modal from "react-bootstrap/Modal";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import { deleteMeeting, updateMeeting } from "../services/meetingService";
+import { errorMessage } from "../services/apiError";
 
 function formatDateTime(date) {
   return new Date(date).toLocaleString("de-CH", {
@@ -78,7 +79,7 @@ function MeetingKopfBaustein({ meeting, agendaItemCount, onSaved }) {
       onSaved();
     } catch (err) {
       console.error(err);
-      setError("Meeting konnte nicht verschoben werden");
+      setError(errorMessage(err, "Meeting konnte nicht verschoben werden"));
     } finally {
       setSaving(false);
     }
@@ -93,7 +94,7 @@ function MeetingKopfBaustein({ meeting, agendaItemCount, onSaved }) {
       navigate("/");
     } catch (err) {
       console.error(err);
-      setError("Meeting konnte nicht gelöscht werden");
+      setError(errorMessage(err, "Meeting konnte nicht gelöscht werden"));
       setSaving(false);
     }
   };

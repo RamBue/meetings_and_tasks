@@ -1,3 +1,4 @@
+import { useState } from "react";
 import Table from "react-bootstrap/Table";
 import Container from "react-bootstrap/Container";
 import Form from "react-bootstrap/Form";
@@ -5,13 +6,17 @@ import { FaEdit } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { API_BASE_URL } from "../config/api";
 import { apiFetch } from "../services/apiFetch";
+import { apiError, errorMessage } from "../services/apiError";
 
 function TasksTable({ tasks, loadTasks }) {
   const navigate = useNavigate();
+  const [error, setError] = useState("");
   const handleEdit = (task) => {
     navigate(`/tasks/${task._id}/edit`);
   };
   const toggleTaskStatus = async (task) => {
+    setError("");
+
     try {
       const newStatus = task.status === "done" ? "open" : "done";
 
@@ -29,16 +34,22 @@ function TasksTable({ tasks, loadTasks }) {
       );
 
       if (!response.ok) {
-        throw new Error("Status konnte nicht aktualisiert werden");
+        throw await apiError(response, "Status konnte nicht aktualisiert werden");
       }
 
       loadTasks();
-    } catch (error) {
-      console.error(error);
+    } catch (err) {
+      console.error(err);
+      setError(errorMessage(err, "Status konnte nicht aktualisiert werden"));
     }
   };
   return (
     <Container className="mt-4">
+      {error && (
+        <div className="text-danger mb-2" role="alert">
+          {error}
+        </div>
+      )}
       <Table striped bordered hover size="sm">
         <thead>
           <tr>

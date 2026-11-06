@@ -5,6 +5,7 @@ import Button from "react-bootstrap/Button";
 import Stack from "react-bootstrap/Stack";
 import Badge from "react-bootstrap/Badge";
 import { createDecision, updateDecision } from "../services/decisionService";
+import { errorMessage } from "../services/apiError";
 
 function EntscheidBaustein({
   decision,
@@ -53,7 +54,7 @@ function EntscheidBaustein({
       onSaved();
     } catch (err) {
       console.error(err);
-      setError("Entscheid konnte nicht gespeichert werden");
+      setError(errorMessage(err, "Entscheid konnte nicht gespeichert werden"));
     } finally {
       setSaving(false);
     }

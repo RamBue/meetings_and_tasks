@@ -1,6 +1,7 @@
 import Information from "../models/information.js";
 import { notifyChange } from "../config/socket.js";
 import { pick } from "../utils/sanitize.js";
+import { handleError } from "../utils/errors.js";
 
 // Felder, die ein Client beim Anlegen setzen darf
 const INFORMATION_FIELDS = ["topic", "description", "meetingId", "agendaItemId"];
@@ -25,10 +26,7 @@ export async function getAllInformations(req, res) {
     res.status(200).json(informations);
   } catch (error) {
     console.error("Error in getAllInformations controller", error);
-
-    res.status(500).json({
-      message: "Internal server error",
-    });
+    handleError(res, error);
   }
 }
 
@@ -41,7 +39,7 @@ export async function getInformationById(req, res) {
     res.json(information);
   } catch (error) {
     console.error("Error in getInformationById controller", error);
-    res.status(500).json({ message: "Internal server error" });
+    handleError(res, error);
   }
 }
 
@@ -55,10 +53,7 @@ export async function createInformation(req, res) {
     res.status(201).json(savedInformation);
   } catch (error) {
     console.error("Error in createInformation controller", error);
-    if (error.name === "ValidationError") {
-      return res.status(400).json({ message: error.message });
-    }
-    res.status(500).json({ message: "Internal server error" });
+    handleError(res, error);
   }
 }
 
@@ -78,10 +73,7 @@ export async function updateInformation(req, res) {
     res.status(200).json(updatedInformation);
   } catch (error) {
     console.error("Error in updateInformation controller", error);
-    if (error.name === "ValidationError") {
-      return res.status(400).json({ message: error.message });
-    }
-    res.status(500).json({ message: "Internal server error" });
+    handleError(res, error);
   }
 }
 
@@ -97,6 +89,6 @@ export async function deleteInformation(req, res) {
     res.status(200).json({ message: "Information deleted successfully!" });
   } catch (error) {
     console.error("Error in deleteInformation controller", error);
-    res.status(500).json({ message: "Internal server error" });
+    handleError(res, error);
   }
 }

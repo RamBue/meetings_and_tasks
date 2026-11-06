@@ -1,6 +1,7 @@
 import Decision from "../models/decision.js";
 import { notifyChange } from "../config/socket.js";
 import { isObjectIdString } from "../utils/sanitize.js";
+import { handleError } from "../utils/errors.js";
 
 // GET all decisions
 export async function getAllDecisions(req, res) {
@@ -20,10 +21,7 @@ export async function getAllDecisions(req, res) {
     res.status(200).json(decisions);
   } catch (error) {
     console.error("Error in getAllDecisions controller", error);
-
-    res.status(500).json({
-      message: "Internal server error",
-    });
+    handleError(res, error);
   }
 }
 
@@ -36,7 +34,7 @@ export async function getDecisionById(req, res) {
     res.json(decision);
   } catch (error) {
     console.error("Error in getDecisionById controller", error);
-    res.status(500).json({ message: "Internal server error" });
+    handleError(res, error);
   }
 }
 
@@ -67,10 +65,7 @@ export async function createDecision(req, res) {
     res.status(201).json(savedDecision);
   } catch (error) {
     console.error("Error in createDecision controller", error);
-    if (error.name === "ValidationError") {
-      return res.status(400).json({ message: error.message });
-    }
-    res.status(500).json({ message: "Internal server error" });
+    handleError(res, error);
   }
 }
 
@@ -90,10 +85,7 @@ export async function updateDecision(req, res) {
     res.status(200).json(updatedDecision);
   } catch (error) {
     console.error("Error in updateDecision controller", error);
-    if (error.name === "ValidationError") {
-      return res.status(400).json({ message: error.message });
-    }
-    res.status(500).json({ message: "Internal server error" });
+    handleError(res, error);
   }
 }
 
@@ -107,6 +99,6 @@ export async function deleteDecision(req, res) {
     res.status(200).json({ message: "Decision deleted successfully!" });
   } catch (error) {
     console.error("Error in deleteDecision controller", error);
-    res.status(500).json({ message: "Internal server error" });
+    handleError(res, error);
   }
 }

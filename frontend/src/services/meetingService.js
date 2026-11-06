@@ -1,5 +1,6 @@
 import { API_BASE_URL } from "../config/api";
 import { apiFetch } from "./apiFetch";
+import { apiError } from "./apiError";
 
 const API_URL = `${API_BASE_URL}/api/meetings`;
 
@@ -7,7 +8,7 @@ export async function getMeetings() {
   const response = await apiFetch(API_URL);
 
   if (!response.ok) {
-    throw new Error("Meetings konnten nicht geladen werden");
+    throw await apiError(response, "Meetings konnten nicht geladen werden");
   }
 
   return response.json();
@@ -17,7 +18,7 @@ export async function getMeetingById(id) {
   const response = await apiFetch(`${API_URL}/${id}`);
 
   if (!response.ok) {
-    throw new Error("Meeting konnte nicht geladen werden");
+    throw await apiError(response, "Meeting konnte nicht geladen werden");
   }
 
   return response.json();
@@ -33,7 +34,7 @@ export async function createMeeting(meeting) {
   });
 
   if (!response.ok) {
-    throw new Error("Meeting konnte nicht gespeichert werden");
+    throw await apiError(response, "Meeting konnte nicht gespeichert werden");
   }
 
   return response.json();
@@ -49,7 +50,7 @@ export async function updateMeeting(id, updates) {
   });
 
   if (!response.ok) {
-    throw new Error("Meeting konnte nicht aktualisiert werden");
+    throw await apiError(response, "Meeting konnte nicht aktualisiert werden");
   }
 
   return response.json();
@@ -61,7 +62,7 @@ export async function deleteMeeting(id) {
   });
 
   if (!response.ok) {
-    throw new Error("Meeting konnte nicht gelöscht werden");
+    throw await apiError(response, "Meeting konnte nicht gelöscht werden");
   }
 
   return response.json();
@@ -77,7 +78,7 @@ export async function uploadProtocol(id, file) {
   });
 
   if (!response.ok) {
-    throw new Error("Protokoll konnte nicht hochgeladen werden");
+    throw await apiError(response, "Protokoll konnte nicht hochgeladen werden");
   }
 
   return response.json();
@@ -89,7 +90,7 @@ export async function downloadProtocol(id, fileName) {
   const response = await apiFetch(`${API_URL}/${id}/protocol/download`);
 
   if (!response.ok) {
-    throw new Error("Protokoll konnte nicht heruntergeladen werden");
+    throw await apiError(response, "Protokoll konnte nicht heruntergeladen werden");
   }
 
   const url = URL.createObjectURL(await response.blob());

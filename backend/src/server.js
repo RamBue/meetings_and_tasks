@@ -17,8 +17,20 @@ import agendaItemsRoutes from "./routes/agendaItemsRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import { requireAuth } from "./middleware/auth.js";
 import { isAuthConfigured } from "./utils/token.js";
+import { errorMiddleware } from "./utils/errors.js";
 
 dotenv.config();
+
+// Fehler, die nirgends abgefangen werden, gehören ins Log. Nach einem
+// unerwarteten Fehler ist der Zustand unklar, daher startet der Dienst neu.
+process.on("unhandledRejection", (reason) => {
+  console.error("Unhandled rejection", reason);
+});
+
+process.on("uncaughtException", (error) => {
+  console.error("Uncaught exception", error);
+  process.exit(1);
+});
 
 if (!isAuthConfigured()) {
   console.error(
@@ -106,6 +118,14 @@ app.use("/api/categories", categoriesRoutes);
 app.use("/api/decisions", decisionsRoutes);
 app.use("/api/informations", informationsRoutes);
 app.use("/api/agenda-items", agendaItemsRoutes);
+
+// Unbekannte API-Adressen
+app.use("/api", (req, res) => {
+  res.status(404).json({ message: "Not found" });
+});
+
+// Zentrale Fehlerbehandlung (muss nach allen Routen stehen)
+app.use(errorMiddleware);
 
 const httpServer = createServer(app);
 initSocket(httpServer, allowedOrigins);

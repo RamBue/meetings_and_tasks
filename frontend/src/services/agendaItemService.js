@@ -1,5 +1,6 @@
 import { API_BASE_URL } from "../config/api";
 import { apiFetch } from "./apiFetch";
+import { apiError } from "./apiError";
 
 const API_URL = `${API_BASE_URL}/api/agenda-items`;
 
@@ -13,7 +14,7 @@ export async function createAgendaItem(agendaItem) {
   });
 
   if (!response.ok) {
-    throw new Error("Traktandum konnte nicht erstellt werden");
+    throw await apiError(response, "Traktandum konnte nicht erstellt werden");
   }
 
   return response.json();
@@ -34,7 +35,7 @@ export async function deleteAgendaItem(id) {
 
   if (response.status === 409) throw conflictError();
   if (!response.ok) {
-    throw new Error("Traktandum konnte nicht gelöscht werden");
+    throw await apiError(response, "Traktandum konnte nicht gelöscht werden");
   }
 
   return response.json();
@@ -51,7 +52,7 @@ export async function updateAgendaItem(id, updates) {
 
   if (response.status === 409) throw conflictError();
   if (!response.ok) {
-    throw new Error("Traktandum konnte nicht aktualisiert werden");
+    throw await apiError(response, "Traktandum konnte nicht aktualisiert werden");
   }
 
   return response.json();

@@ -5,6 +5,7 @@ import Card from "react-bootstrap/Card";
 import Dropdown from "react-bootstrap/Dropdown";
 import { getMeetingById } from "../services/meetingService";
 import { useDataChanged } from "../hooks/useDataChanged";
+import { errorMessage } from "../services/apiError";
 import { exportMeetingPdf } from "../utils/exportMeetingPdf";
 import { CATEGORIES } from "../config/categories";
 import PendenzBaustein from "../components/PendenzBaustein";
@@ -46,7 +47,7 @@ function MeetingDetailPage() {
         console.error("Fehler beim Laden des Meetings:", err);
         // Die Fehlermeldung erscheint nur, wenn das Meeting noch nie geladen werden konnte
         if (!cancelled && !hasLoaded.current) {
-          setError("Meeting konnte nicht geladen werden");
+          setError(errorMessage(err, "Meeting konnte nicht geladen werden"));
         }
       })
       .finally(() => {

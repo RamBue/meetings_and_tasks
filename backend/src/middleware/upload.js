@@ -35,7 +35,7 @@ export const uploadProtocolPdf = multer({
   storage: protocolStorage,
   fileFilter: (req, file, cb) => {
     if (file.mimetype !== "application/pdf") {
-      return cb(new Error("Nur PDF-Dateien sind erlaubt"));
+      return cb(Object.assign(new Error("Only PDF files are allowed"), { code: "NOT_PDF" }));
     }
     cb(null, true);
   },
